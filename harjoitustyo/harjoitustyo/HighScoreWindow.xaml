@@ -11,6 +11,11 @@
         <TextBlock x:Name="txbHighScore" HorizontalAlignment="Center" Margin="153,25,163,0" TextWrapping="Wrap" Text="Best  Scores" VerticalAlignment="Top" Height="40" Width="209" TextAlignment="Center" LineHeight="48" FontSize="22" FontFamily="Perpetua Titling MT" Foreground="Red"/>
         <ListBox x:Name="txbScore" HorizontalAlignment="Left" Height="178" Margin="252,109,0,0" VerticalAlignment="Top" Width="254" Background="#FFDC3232"/>
         <Label x:Name="label" Content="Tänne pisteet" HorizontalAlignment="Left" Margin="252,109,0,0" VerticalAlignment="Top" Width="92"/>
+        <Button x:Name="btnHighScore" Content="Main Menu" HorizontalAlignment="Left" Margin="330,320,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0" Click="btnHighScore_Click">
+            <Button.Background>
+                <SolidColorBrush Color="Green" Opacity="0.0" />
+            </Button.Background>
+        </Button>
 
 
 
