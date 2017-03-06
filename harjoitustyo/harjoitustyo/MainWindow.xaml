@@ -5,11 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="MurderKillBurn!!!" Height="Auto"  Width="Auto" Visibility="Visible" WindowStyle="None">
-    <Grid>
-        
-        <Canvas>
-            
-        </Canvas>
-    </Grid>
+        Title="MainWindow" WindowState="Maximized"
+        WindowStyle="None">
+    <Grid/>
 </Window>
