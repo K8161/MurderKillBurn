@@ -7,5 +7,5 @@
         mc:Ignorable="d"
         Title="MainWindow" WindowState="Maximized"
         WindowStyle="None">
-    <Grid/>
+    <Grid Background="Aquamarine"/>
 </Window>
