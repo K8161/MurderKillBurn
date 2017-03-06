@@ -15,25 +15,13 @@ using System.Windows.Shapes;
 namespace harjoitustyo
 {
     /// <summary>
-    /// Interaction logic for StartWindow.xaml
+    /// Interaction logic for HighScoreWindow.xaml
     /// </summary>
-    public partial class StartWindow : Window
+    public partial class HighScoreWindow : Window
     {
-        public StartWindow()
+        public HighScoreWindow()
         {
             InitializeComponent();
-        }
-
-        private void btnQuit_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        private void btnHighScore_Click(object sender, RoutedEventArgs e)
-        {
-            HighScoreWindow window1 = new HighScoreWindow();
-            window1.Show();
-            this.Close();
         }
     }
 }

@@ -14,7 +14,7 @@
             </Button.Background>
         </Button>
 
-        <Button x:Name="btnHighScore" Content="High Score" HorizontalAlignment="Left" Margin="202,157,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0">
+        <Button x:Name="btnHighScore" Content="High Score" HorizontalAlignment="Left" Margin="202,157,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0" Click="btnHighScore_Click">
             <Button.Background>
                 <SolidColorBrush Color="Green" Opacity="0.0" />
             </Button.Background>
