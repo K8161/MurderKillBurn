@@ -13,6 +13,7 @@ namespace harjoitustyo
         public int Damage { get; set; }
         public bool IsRanged { get; set; }
         public double MaxRange { get; set; }
+        public int ClipSize { get; set; }
 
         public void Reload()
         {
