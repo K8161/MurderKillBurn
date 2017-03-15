@@ -17,11 +17,5 @@ namespace harjoitustyo
 
         }
 
-        private void btnHighScore_Click(object sender, RoutedEventArgs e)
-        {
-            StartWindow window1 = new StartWindow();
-            window1.Show();
-            this.Close();
-        }
     }
 }
