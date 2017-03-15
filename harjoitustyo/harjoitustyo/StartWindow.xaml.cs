@@ -35,5 +35,11 @@ namespace harjoitustyo
             window1.Show();
             this.Close();
         }
+
+        private void btnNewGame_Click(object sender, RoutedEventArgs e)
+        {
+            NameWindow window = new NameWindow();
+            window.Show();
+        }
     }
 }

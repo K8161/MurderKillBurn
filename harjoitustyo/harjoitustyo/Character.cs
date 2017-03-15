@@ -52,6 +52,12 @@ namespace harjoitustyo
         public int Ammo { get; set; }
         public int Score { get; set; }
 
+        public Player (string name)
+          {
+              Name = name;
+          } 
+
+
         public void GainScore()
         {
 
