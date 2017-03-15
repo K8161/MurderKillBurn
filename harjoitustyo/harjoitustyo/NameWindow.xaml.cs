@@ -31,7 +31,7 @@ namespace harjoitustyo
 
             if (input == "Insert Player Name" || input == "")
             {
-                MessageBox.Show("Give player name");
+                MessageBox.Show("Give player name!");
             }
 
             else
