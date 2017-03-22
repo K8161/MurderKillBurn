@@ -19,7 +19,7 @@ namespace harjoitustyo
     /// </summary>
     public partial class NameWindow : Window
     {
-        string input;
+        public string input;
         public NameWindow()
         {
             InitializeComponent();
@@ -36,13 +36,12 @@ namespace harjoitustyo
 
             else
             {
-                Player player = new Player(input);
-                MainWindow mainwindow = new MainWindow();
-                mainwindow.Show();
+                StartWindow startwindow = new StartWindow();
+                startwindow.Show();
                 // CloseAllWindows();
                 foreach (Window item in App.Current.Windows)
                 {
-                    if (item != mainwindow)
+                    if (item != startwindow)
                         item.Close();
                 }
 

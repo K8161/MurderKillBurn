@@ -38,8 +38,13 @@ namespace harjoitustyo
 
         private void btnNewGame_Click(object sender, RoutedEventArgs e)
         {
-            NameWindow window = new NameWindow();
-            window.Show();
+            MainWindow mainwindow = new MainWindow();
+            mainwindow.Show();
+            foreach (Window item in App.Current.Windows)
+            {
+                if (item != mainwindow)
+                    item.Close();
+            }
         }
     }
 }
