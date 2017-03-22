@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="StartWindow" WindowState="Maximized"
+        Title="StartWindow" Height="600" Width="800"
         WindowStyle="None">
     <Grid Background="Azure">
         <TextBlock x:Name="txbName" HorizontalAlignment="Center" Margin="153,25,163,0" TextWrapping="Wrap" Text="MurderKillBurn" VerticalAlignment="Top" Height="40" Width="209" TextAlignment="Center" LineHeight="48" FontSize="22" FontFamily="Perpetua Titling MT" Foreground="Red"/>

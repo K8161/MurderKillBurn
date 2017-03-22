@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="HighScoreWindow" WindowState="Maximized"
+        Title="HighScoreWindow" Height="600" Width="800"
         WindowStyle="None">
     <Grid>
         <TextBlock x:Name="txbHighScore" HorizontalAlignment="Center" Margin="153,25,163,0" TextWrapping="Wrap" Text="Best  Scores" VerticalAlignment="Top" Height="40" Width="209" TextAlignment="Center" LineHeight="48" FontSize="22" FontFamily="Perpetua Titling MT" Foreground="Red"/>
