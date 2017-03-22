@@ -27,21 +27,22 @@ namespace harjoitustyo
         Down,
         Left
     }
+
 public partial class MainWindow : Window
     {
         //variables and consts
         private const int minimi = 5;
-        private const int maxHeight = 380;
-        private const int maxWidth = 620;
+        private const int maxHeight = 540;
+        private const int maxWidth = 740;
         private const int characterWidth = 10;
         private int difficulty = 0; //timerin ajastin aika ms
         private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
         private const int bonusCount = 20;
         private List<Point> snakeParts = new List<Point>();
-        private Point startingPoint = new Point(100, 100);
+        private Point startingPoint = new Point(200, 100);
         private Point currentPosition = new Point();
         //private Direction lastDirection = Direction.Right;
-        private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
+        //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
         public MainWindow()
@@ -87,7 +88,7 @@ public partial class MainWindow : Window
         private void PaintSnake(Point currentpoint)
         {
             Rectangle snake = new Rectangle();
-            snake.Fill = Brushes.Aquamarine;
+            snake.Fill = Brushes.GhostWhite;
             snake.Width = characterWidth;
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
@@ -121,22 +122,54 @@ public partial class MainWindow : Window
                         this.Close();
                     break;
                 case Key.Left:
+                    if ((currentPosition.X > 0))
                     currentPosition.X -= characterWidth / 4;
                     break;
                 case Key.Up:
+                    if ((currentPosition.Y > 0))
                     currentPosition.Y -= characterWidth / 4;
                     break;
                 case Key.Right:
+                    if ((currentPosition.X < maxWidth))
                     currentPosition.X += characterWidth / 4;
                     break;
                 case Key.Down:
+                    if ((currentPosition.Y < maxHeight))
                     currentPosition.Y += characterWidth / 4;
                     break;
-                case Key.Down & Key.Left: 
-                    currentPosition.Y += characterWidth / 4;
-                    currentPosition.X -= characterWidth / 4;
+
+                /*case Key.NumPad1:
+                    if ((currentPosition.Y < maxHeight) &&
+                        (currentPosition.X > 0))
+                    {
+                        currentPosition.Y += characterWidth / 4;
+                        currentPosition.X -= characterWidth / 4;
+                    }
                     break;
-                //case Key.Down & Key.Right:
+                case Key.NumPad7:
+                    if ((currentPosition.Y > 0) &&
+                        (currentPosition.X > 0))
+                    {
+                        currentPosition.Y -= characterWidth / 4;
+                        currentPosition.X -= characterWidth / 4;
+                    }
+                    break;
+                case Key.NumPad9:
+                    if ((currentPosition.Y < maxHeight) &&
+                        (currentPosition.X < maxWidth))
+                    {
+                        currentPosition.Y -= characterWidth / 4;
+                        currentPosition.X += characterWidth / 4;
+                    }
+                    break;
+                case Key.NumPad3:
+                    if ((currentPosition.Y > 0) &&
+                        (currentPosition.X < maxWidth))
+                    {
+                        currentPosition.Y += characterWidth / 4;
+                        currentPosition.X += characterWidth / 4;
+                    }
+                    break;*/
             }
            // lastDirection = currentDirection;
         }
@@ -145,9 +178,9 @@ public partial class MainWindow : Window
             PaintSnake(currentPosition);
             //törmäystarkastelut 1-3
             //TT#1 tarkistetaan onko kanvaasilla
-            if ((currentPosition.X > maxWidth) || (currentPosition.X < minimi) ||
+            /*if ((currentPosition.X > maxWidth) || (currentPosition.X < minimi) ||
                 (currentPosition.Y > maxHeight) || (currentPosition.Y < minimi))
-                GameOver();
+                GameOver();*/
             //TT#3
             //tarkistetaan osuuko omenaan
             int n = 0;

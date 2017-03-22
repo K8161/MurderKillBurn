@@ -9,7 +9,7 @@
         WindowStyle="None">
     <Grid Background="Aquamarine">
         <Canvas Name="paintCanvas" Background="Black"
-                HorizontalAlignment="Stretch" MaxWidth="643" MaxHeight="422">
+                HorizontalAlignment="Stretch" MaxWidth="750" MaxHeight="550">
         </Canvas>
     </Grid>
 </Window>

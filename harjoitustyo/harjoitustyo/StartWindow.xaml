@@ -5,27 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="StartWindow" Height="600" Width="800"
+        Title="StartWindow" Height="300" Width="300"
         WindowStyle="None">
     <Grid Background="Azure">
-        <TextBlock x:Name="txbName" HorizontalAlignment="Center" Margin="153,25,163,0" TextWrapping="Wrap" Text="MurderKillBurn" VerticalAlignment="Top" Height="40" Width="209" TextAlignment="Center" LineHeight="48" FontSize="22" FontFamily="Perpetua Titling MT" Foreground="Red"/>
-        <Button x:Name="btnNewGame" Content="New Game" HorizontalAlignment="Center" Margin="202,115,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0" Click="btnNewGame_Click">
-            <Button.Background>
-                <SolidColorBrush Color="Green" Opacity="0.0" />
-            </Button.Background>
-        </Button>
+        <StackPanel>
+            <TextBlock x:Name="txbName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="MurderKillBurn" VerticalAlignment="Top" 
+                       Height="32" Width="256" TextAlignment="Center" LineHeight="48" FontSize="28" FontFamily="Perpetua Titling MT" 
+                       Foreground="Red" Margin="10">
+                <TextBlock.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#7F0E0E0E" Offset="0"/>
+                        <GradientStop Color="#0CFFFFFF" Offset="1"/>
+                    </LinearGradientBrush>
+                </TextBlock.Background>
+            </TextBlock>
+            <Button x:Name="btnNewGame" Content="New Game" HorizontalAlignment="Center" Margin="5" VerticalAlignment="Top" Width="99" 
+                    FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" FontSize="18" BorderThickness="0" 
+                    Click="btnNewGame_Click">
+                <Button.Background>
+                    <SolidColorBrush Color="Green" Opacity="0.1" />
+                </Button.Background>
+            </Button>
 
-        <Button x:Name="btnHighScore" Content="High Score" HorizontalAlignment="Center" Margin="202,157,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0" Click="btnHighScore_Click">
-            <Button.Background>
-                <SolidColorBrush Color="Green" Opacity="0.0" />
-            </Button.Background>
-        </Button>
+            <Button x:Name="btnHighScore" Content="High Score" HorizontalAlignment="Center" Margin="5" VerticalAlignment="Top" Width="99" 
+                    FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" FontSize="18" BorderThickness="0" 
+                    Click="btnHighScore_Click">
+                <Button.Background>
+                    <SolidColorBrush Color="Green" Opacity="0.1" />
+                </Button.Background>
+            </Button>
 
-        <Button x:Name="btnQuit" Content="Quit" HorizontalAlignment="Center" Margin="202,202,0,0" VerticalAlignment="Top" Width="99" FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" BorderThickness="0" Click="btnQuit_Click">
-            <Button.Background>
-                <SolidColorBrush Color="Green" Opacity="0.0" />
-            </Button.Background>
-        </Button>
-
+            <Button x:Name="btnQuit" Content="Quit" HorizontalAlignment="Center" Margin="5" VerticalAlignment="Bottom" Width="99" 
+                    FontFamily="Impact" Height="28" BorderBrush="{x:Null}" Opacity="0.995" FontSize="18" BorderThickness="0" 
+                    Click="btnQuit_Click">
+                <Button.Background>
+                    <SolidColorBrush Color="Green" Opacity="0.1" />
+                </Button.Background>
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>
