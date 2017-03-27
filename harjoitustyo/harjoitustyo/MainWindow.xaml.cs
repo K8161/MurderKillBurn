@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,13 +21,13 @@ namespace harjoitustyo
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public enum Direction
+    /*public enum Direction
     {
         Up,
         Right,
         Down,
         Left
-    }
+    }*/
 
 public partial class MainWindow : Window
     {
@@ -35,7 +36,7 @@ public partial class MainWindow : Window
         private const int maxHeight = 540;
         private const int maxWidth = 740;
         private const int characterWidth = 10;
-        private int difficulty = 0; //timerin ajastin aika ms
+        private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
         private const int bonusCount = 20;
         private List<Point> snakeParts = new List<Point>();
@@ -45,19 +46,29 @@ public partial class MainWindow : Window
         //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
+        private double i = 0;
+        Rectangle snake = new Rectangle();
+        private Point cursorPoint = new Point();
+        private Point oldCursorPoint = new Point();
+
         public MainWindow()
         {
             InitializeComponent();
+
             //tarvittavat alustukset
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
             timer.Tick += new EventHandler(timer_Tick);
+
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
+            this.MouseMove += new MouseEventHandler(Rotate);
+
             //piirretään omenat ja käärme
             IniBonusPoints();
             PaintSnake(startingPoint);
             currentPosition = startingPoint;
+            paintCanvas.Children.Add(snake);
 
             //start game
             timer.Start();
@@ -70,6 +81,28 @@ public partial class MainWindow : Window
                 PaintBonus(n);
             }
         }
+
+        private void Rotate(object sender, MouseEventArgs e)
+        { 
+            RotateTransform rotate = new RotateTransform();
+            rotate.Angle = i;
+            rotate.CenterX = snake.Width / 2;
+            rotate.CenterY = snake.Height / 2;
+            snake.RenderTransform = rotate;
+
+            cursorPoint = Mouse.GetPosition(Application.Current.MainWindow);
+
+            if (cursorPoint.X < currentPosition.X)
+            {
+                i++;
+            }
+
+            if (cursorPoint.X > currentPosition.X)
+            {
+                i--;
+            }
+        }
+
         private void PaintBonus(int index)
         {
             //arvotaan omenalle piste eli X ja Y -koordinaatti
@@ -87,14 +120,15 @@ public partial class MainWindow : Window
         }
         private void PaintSnake(Point currentpoint)
         {
-            Rectangle snake = new Rectangle();
+            //Rectangle snake = new Rectangle();
+            
             snake.Fill = Brushes.GhostWhite;
             snake.Width = characterWidth;
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
             Canvas.SetLeft(snake, currentpoint.X);
             int count = paintCanvas.Children.Count;
-            paintCanvas.Children.Add(snake);
+            //paintCanvas.Children.Add(snake);
             //snakeParts.Add(currentPosition);
             //rajoitetaan käärmeen pituutta
             //huom! bonusCount < snakeLength
@@ -176,31 +210,20 @@ public partial class MainWindow : Window
         private void timer_Tick(object sender, EventArgs e)
         {
             PaintSnake(currentPosition);
-            //törmäystarkastelut 1-3
-            //TT#1 tarkistetaan onko kanvaasilla
-            /*if ((currentPosition.X > maxWidth) || (currentPosition.X < minimi) ||
-                (currentPosition.Y > maxHeight) || (currentPosition.Y < minimi))
-                GameOver();*/
-            //TT#3
-            //tarkistetaan osuuko omenaan
+            
             int n = 0;
             foreach (Point point in bonusPoints)
             {
                 if ((Math.Abs(point.X - currentPosition.X) < characterWidth) &&
                     (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
                 {
-                    //syödään omena
-                  //  score += 10;
-                  //  snakeLength += 1;
-                    //nopeutetaan peliä
                     if (difficulty > 5)
                     {
                         difficulty--;
                         timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
                     }
-                //    this.Title = "SnakeWPF your score: " + score;
-                    bonusPoints.RemoveAt(n);
-                    paintCanvas.Children.RemoveAt(n);
+                    //bonusPoints.RemoveAt(n);
+                    //paintCanvas.Children.RemoveAt(n);
                     PaintBonus(n);
                     break;
                 }

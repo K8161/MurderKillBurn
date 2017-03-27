@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="StartWindow" Height="300" Width="300"
-        WindowStyle="None">
+        Title="StartWindow" Height="200" Width="400"
+        WindowStyle="None" WindowStartupLocation="CenterScreen">
     <Grid Background="Azure">
         <StackPanel>
             <TextBlock x:Name="txbName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="MurderKillBurn" VerticalAlignment="Top" 

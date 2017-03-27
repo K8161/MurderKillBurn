@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace harjoitustyo
 {
+    public enum Direction
+    {
+        Up,
+        Right,
+        Down,
+        Left
+    }
+
     class Character
     {
+        public Vector vector { get; set; }
+        public Point point { get; set; }
         public string Name { get; set; }
         public int Hitpoints { get; set; }
         public bool HasWeapon { get; set; }
