@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800"
-        WindowStyle="None">
+        WindowStyle="None" Cursor="Cross">
     <Grid Background="Black">
         <Canvas Name="paintCanvas" Background="WhiteSmoke"
-                HorizontalAlignment="Stretch" MaxWidth="780" MaxHeight="580"/>
+                HorizontalAlignment="Stretch" MaxWidth="780" MaxHeight="580">
+        </Canvas>
     </Grid>
 </Window>

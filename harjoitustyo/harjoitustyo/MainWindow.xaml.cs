@@ -36,7 +36,7 @@ public partial class MainWindow : Window
         private const int maxHeight = 540;
         private const int maxWidth = 740;
         private const int characterWidth = 20;
-        private int difficulty = 5; //timerin ajastin aika ms
+        private int difficulty = 0; //timerin ajastin aika ms
         private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
         private const int bonusCount = 20;
         private List<Point> snakeParts = new List<Point>();
@@ -60,7 +60,10 @@ public partial class MainWindow : Window
 
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-            this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
+            this.KeyDown += new KeyEventHandler(UpKeyPressed);
+            this.KeyDown += new KeyEventHandler(DownKeyPressed);
+            this.KeyDown += new KeyEventHandler(LeftKeyPressed);
+            this.KeyDown += new KeyEventHandler(RightKeyPressed);
             this.MouseMove += new MouseEventHandler(Rotate);
 
             //piirretään omenat ja käärme
@@ -90,7 +93,9 @@ public partial class MainWindow : Window
 
         private double Angle(Point origin, Point target)
         {
-            Vector vector = target - origin;
+            Vector vector = new Vector();
+            vector.X = target.X - origin.X;
+            vector.Y = target.Y - origin.Y;
             vector.Normalize();
             double dotAngle = -vector.Y;
             double angle = Math.Acos(dotAngle);
@@ -113,8 +118,8 @@ public partial class MainWindow : Window
 
                 snake.RenderTransform = rotate;
 
-                double y = Canvas.GetTop(snake) + snake.ActualWidth;
-                double x = Canvas.GetLeft(snake) + snake.ActualHeight;
+                double y = Canvas.GetTop(snake) + snake.ActualWidth / 2.0;
+                double x = Canvas.GetLeft(snake) + snake.ActualHeight / 2.0;
                 Point originPoint = new Point(x, y);
 
                 rotate.Angle = Angle(originPoint, targetPoint);
@@ -157,7 +162,7 @@ public partial class MainWindow : Window
             /*if (count > characterWidth)
             {
                 paintCanvas.Children.RemoveAt(count - characterWidth);
-                //snakeParts.RemoveAt(count - characterWidth);
+                snakeParts.RemoveAt(count - characterWidth);
             }*/
         }
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
@@ -177,48 +182,87 @@ public partial class MainWindow : Window
                     else
                         this.Close();
                     break;
-                case Key.Left:
-                    if ((currentPosition.X > 0))
+                /*case Key.Left:
+                    if (currentPosition.X > minimi)
                     currentPosition.X -= characterWidth / 8;
                     break;
                 case Key.Up:
-                    if ((currentPosition.Y > 0))
+                    if (currentPosition.Y > minimi)
                     currentPosition.Y -= characterWidth / 8;
                     break;
                 case Key.Right:
-                    if ((currentPosition.X < maxWidth))
+                    if (currentPosition.X < maxWidth)
                     currentPosition.X += characterWidth / 8;
                     break;
                 case Key.Down:
-                    if ((currentPosition.Y < maxHeight))
+                    if (currentPosition.Y < maxHeight)
                     currentPosition.Y += characterWidth / 8;
-                    break;
+                    break;*/
             }
            // lastDirection = currentDirection;
         }
+
+        private void UpKeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                    if (currentPosition.Y > minimi)
+                        currentPosition.Y -= characterWidth / 8;
+                    break;
+            }
+            
+        }
+
+        private void DownKeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Down:
+                    if (currentPosition.Y < maxHeight)
+                        currentPosition.Y += characterWidth / 8;
+                    break;
+            }
+
+        }
+
+        private void LeftKeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    if (currentPosition.X > minimi)
+                        currentPosition.X -= characterWidth / 8;
+                    break;
+            }
+
+        }
+
+        private void RightKeyPressed(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Right:
+                    if (currentPosition.X < maxWidth)
+                        currentPosition.X += characterWidth / 8;
+                    break;
+            }
+
+        }
+
         private void timer_Tick(object sender, EventArgs e)
         {
             PaintSnake(currentPosition);
             
-            int n = 0;
             try
             {
                 foreach (Point point in bonusPoints)
                 {
-                    if ((Math.Abs(point.X - currentPosition.X) < characterWidth) &&
-                        (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
+                    if ((Math.Abs(point.X - currentPosition.X) > characterWidth) &&
+                       (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
                     {
-                        /*if (difficulty > 5)
-                        {
-                            difficulty--;
-                            timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
-                        }*/
-                        //bonusPoints.RemoveAt(n);
-                        //paintCanvas.Children.RemoveAt(n);
-                        //PaintBonus(n);
-                        break;
+
                     }
-                    n++;
                 }
             }
             catch (Exception ex)
@@ -226,6 +270,7 @@ public partial class MainWindow : Window
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void GameOver()
         {
             timer.Stop();
