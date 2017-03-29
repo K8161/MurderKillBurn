@@ -35,7 +35,7 @@ public partial class MainWindow : Window
         private const int minimi = 5;
         private const int maxHeight = 540;
         private const int maxWidth = 740;
-        private const int characterWidth = 10;
+        private const int characterWidth = 20;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
         private const int bonusCount = 20;
@@ -59,6 +59,7 @@ public partial class MainWindow : Window
             timer.Tick += new EventHandler(timer_Tick);
 
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
+            this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.MouseMove += new MouseEventHandler(Rotate);
 
@@ -132,8 +133,8 @@ public partial class MainWindow : Window
             //omenan piirto
              Ellipse omena = new Ellipse();
              omena.Fill = Brushes.Gray;
-             omena.Width = rnd.Next(10, 25);
-             omena.Height = rnd.Next(10, 25);
+             omena.Width = rnd.Next(10, 40);
+             omena.Height = rnd.Next(10, 40);
              Canvas.SetTop(omena, point.Y);
              Canvas.SetLeft(omena, point.X);
              paintCanvas.Children.Insert(index, omena);
@@ -141,23 +142,23 @@ public partial class MainWindow : Window
         }
         private void PaintSnake(Point currentpoint)
         {
-            //Rectangle snake = new Rectangle();
-            
-            snake.Fill = Brushes.GhostWhite;
+            ImageBrush player = new ImageBrush();
+            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
+            snake.Fill = player;
             snake.Width = characterWidth;
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
             Canvas.SetLeft(snake, currentpoint.X);
-            int count = paintCanvas.Children.Count;
+            //int count = paintCanvas.Children.Count;
             //paintCanvas.Children.Add(snake);
             //snakeParts.Add(currentPosition);
             //rajoitetaan käärmeen pituutta
             //huom! bonusCount < snakeLength
-            if (count > characterWidth)
+            /*if (count > characterWidth)
             {
                 paintCanvas.Children.RemoveAt(count - characterWidth);
                 //snakeParts.RemoveAt(count - characterWidth);
-            }
+            }*/
         }
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
@@ -178,19 +179,19 @@ public partial class MainWindow : Window
                     break;
                 case Key.Left:
                     if ((currentPosition.X > 0))
-                    currentPosition.X -= characterWidth / 4;
+                    currentPosition.X -= characterWidth / 8;
                     break;
                 case Key.Up:
                     if ((currentPosition.Y > 0))
-                    currentPosition.Y -= characterWidth / 4;
+                    currentPosition.Y -= characterWidth / 8;
                     break;
                 case Key.Right:
                     if ((currentPosition.X < maxWidth))
-                    currentPosition.X += characterWidth / 4;
+                    currentPosition.X += characterWidth / 8;
                     break;
                 case Key.Down:
                     if ((currentPosition.Y < maxHeight))
-                    currentPosition.Y += characterWidth / 4;
+                    currentPosition.Y += characterWidth / 8;
                     break;
             }
            // lastDirection = currentDirection;
@@ -207,14 +208,14 @@ public partial class MainWindow : Window
                     if ((Math.Abs(point.X - currentPosition.X) < characterWidth) &&
                         (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
                     {
-                        if (difficulty > 5)
+                        /*if (difficulty > 5)
                         {
                             difficulty--;
                             timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
-                        }
+                        }*/
                         //bonusPoints.RemoveAt(n);
                         //paintCanvas.Children.RemoveAt(n);
-                        PaintBonus(n);
+                        //PaintBonus(n);
                         break;
                     }
                     n++;

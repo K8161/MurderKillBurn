@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800"
         WindowStyle="None">
-    <Grid Background="Aquamarine">
-        <Canvas Name="paintCanvas" Background="Black"
-                HorizontalAlignment="Stretch" MaxWidth="750" MaxHeight="550"/>
+    <Grid Background="Black">
+        <Canvas Name="paintCanvas" Background="WhiteSmoke"
+                HorizontalAlignment="Stretch" MaxWidth="780" MaxHeight="580"/>
     </Grid>
 </Window>
