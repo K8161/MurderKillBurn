@@ -46,10 +46,8 @@ public partial class MainWindow : Window
         //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
-        private double i = 0;
         Rectangle snake = new Rectangle();
-        private Point cursorPoint = new Point();
-        private Point oldCursorPoint = new Point();
+        RotateTransform rotate = new RotateTransform();
 
         public MainWindow()
         {
@@ -78,28 +76,51 @@ public partial class MainWindow : Window
         {
             for (int n = 0; n < bonusCount; n++)
             {
-                PaintBonus(n);
+                try
+                {
+                    PaintBonus(n);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private double Angle(Point origin, Point target)
+        {
+            Vector vector = target - origin;
+            vector.Normalize();
+            double dotAngle = -vector.Y;
+            double angle = Math.Acos(dotAngle);
+            angle = angle * 180 / Math.PI;
+            if (vector.X > 0)
+            {
+                return angle;
+            }
+            else
+            {
+                return -angle;
             }
         }
 
         private void Rotate(object sender, MouseEventArgs e)
-        { 
-            RotateTransform rotate = new RotateTransform();
-            rotate.Angle = i;
-            rotate.CenterX = snake.Width / 2;
-            rotate.CenterY = snake.Height / 2;
-            snake.RenderTransform = rotate;
-
-            cursorPoint = Mouse.GetPosition(Application.Current.MainWindow);
-
-            if (cursorPoint.X < currentPosition.X)
+        {
+            try
             {
-                i++;
+                Point targetPoint = e.GetPosition(this);
+
+                snake.RenderTransform = rotate;
+
+                double y = Canvas.GetTop(snake) + snake.ActualWidth;
+                double x = Canvas.GetLeft(snake) + snake.ActualHeight;
+                Point originPoint = new Point(x, y);
+
+                rotate.Angle = Angle(originPoint, targetPoint);
             }
-
-            if (cursorPoint.X > currentPosition.X)
+            catch (Exception ex)
             {
-                i--;
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -110,9 +131,9 @@ public partial class MainWindow : Window
                                     rnd.Next(minimi, maxHeight));
             //omenan piirto
              Ellipse omena = new Ellipse();
-             omena.Fill = Brushes.HotPink;
-             omena.Width = characterWidth;
-             omena.Height = characterWidth;
+             omena.Fill = Brushes.Gray;
+             omena.Width = rnd.Next(10, 25);
+             omena.Height = rnd.Next(10, 25);
              Canvas.SetTop(omena, point.Y);
              Canvas.SetLeft(omena, point.X);
              paintCanvas.Children.Insert(index, omena);
@@ -171,39 +192,6 @@ public partial class MainWindow : Window
                     if ((currentPosition.Y < maxHeight))
                     currentPosition.Y += characterWidth / 4;
                     break;
-
-                /*case Key.NumPad1:
-                    if ((currentPosition.Y < maxHeight) &&
-                        (currentPosition.X > 0))
-                    {
-                        currentPosition.Y += characterWidth / 4;
-                        currentPosition.X -= characterWidth / 4;
-                    }
-                    break;
-                case Key.NumPad7:
-                    if ((currentPosition.Y > 0) &&
-                        (currentPosition.X > 0))
-                    {
-                        currentPosition.Y -= characterWidth / 4;
-                        currentPosition.X -= characterWidth / 4;
-                    }
-                    break;
-                case Key.NumPad9:
-                    if ((currentPosition.Y < maxHeight) &&
-                        (currentPosition.X < maxWidth))
-                    {
-                        currentPosition.Y -= characterWidth / 4;
-                        currentPosition.X += characterWidth / 4;
-                    }
-                    break;
-                case Key.NumPad3:
-                    if ((currentPosition.Y > 0) &&
-                        (currentPosition.X < maxWidth))
-                    {
-                        currentPosition.Y += characterWidth / 4;
-                        currentPosition.X += characterWidth / 4;
-                    }
-                    break;*/
             }
            // lastDirection = currentDirection;
         }
@@ -212,22 +200,29 @@ public partial class MainWindow : Window
             PaintSnake(currentPosition);
             
             int n = 0;
-            foreach (Point point in bonusPoints)
+            try
             {
-                if ((Math.Abs(point.X - currentPosition.X) < characterWidth) &&
-                    (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
+                foreach (Point point in bonusPoints)
                 {
-                    if (difficulty > 5)
+                    if ((Math.Abs(point.X - currentPosition.X) < characterWidth) &&
+                        (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
                     {
-                        difficulty--;
-                        timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
+                        if (difficulty > 5)
+                        {
+                            difficulty--;
+                            timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
+                        }
+                        //bonusPoints.RemoveAt(n);
+                        //paintCanvas.Children.RemoveAt(n);
+                        PaintBonus(n);
+                        break;
                     }
-                    //bonusPoints.RemoveAt(n);
-                    //paintCanvas.Children.RemoveAt(n);
-                    PaintBonus(n);
-                    break;
+                    n++;
                 }
-                n++;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
         private void GameOver()
