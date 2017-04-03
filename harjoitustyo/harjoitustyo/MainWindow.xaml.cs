@@ -36,18 +36,22 @@ public partial class MainWindow : Window
         private const int maxHeight = 860;
         private const int maxWidth = 1560;
         private const int characterWidth = 20;
-        private int difficulty = 0; //timerin ajastin aika ms
-        private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
-        private const int bonusCount = 20;
-        private List<Point> snakeParts = new List<Point>();
-        private Point startingPoint = new Point(200, 100);
-        private Point currentPosition = new Point();
+        private int difficulty = 5; //timerin ajastin aika ms
+        private List<Point> rocks = new List<Point>(); //kivikokoelma
+        private const int obstacleCount = 20;
+        //private List<Point> snakeParts = new List<Point>();
+        private Vector startingPoint = new Vector(200, 100);
+        private Vector currentPosition = new Vector();
         //private Direction lastDirection = Direction.Right;
         //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
-        Rectangle snake = new Rectangle();
+        Ellipse snake = new Ellipse();
         RotateTransform rotate = new RotateTransform();
+        Vector charMove_norm;
+        Obstacle rock = new Obstacle();
+
+        //Engine engine = new Engine();
 
         public MainWindow()
         {
@@ -55,19 +59,21 @@ public partial class MainWindow : Window
 
             //tarvittavat alustukset
             timer = new DispatcherTimer();
+            
             timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
             timer.Tick += new EventHandler(timer_Tick);
 
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-            this.KeyDown += new KeyEventHandler(UpKeyPressed);
+            /*this.KeyDown += new KeyEventHandler(UpKeyPressed);
             this.KeyDown += new KeyEventHandler(DownKeyPressed);
             this.KeyDown += new KeyEventHandler(LeftKeyPressed);
-            this.KeyDown += new KeyEventHandler(RightKeyPressed);
+            this.KeyDown += new KeyEventHandler(RightKeyPressed);*/
             this.MouseMove += new MouseEventHandler(Rotate);
+            this.MouseMove += new MouseEventHandler(charMove);
 
-            //piirretään omenat ja käärme
-            IniBonusPoints();
+            //piirretään esteet ja pelaaja
+            //IniRocks();
             PaintSnake(startingPoint);
             currentPosition = startingPoint;
             paintCanvas.Children.Add(snake);
@@ -76,19 +82,34 @@ public partial class MainWindow : Window
             timer.Start();
         }
 
-        private void IniBonusPoints()
+        private void IniRocks()
         {
-            for (int n = 0; n < bonusCount; n++)
+            for (int n = 0; n < obstacleCount; n++)
             {
                 try
                 {
-                    PaintBonus(n);
+                    rock.PaintObstacle(n);
+                    paintCanvas.Children.Insert(rocks.Count, rock.Rock);
+                    rocks.Insert(rocks.Count, rock.Coordinates);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        public void charMove(object sender, MouseEventArgs e)
+        {
+
+            Point targ = e.GetPosition(paintCanvas);
+            Vector tarVec = new Vector(targ.X, targ.Y);
+            Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
+
+
+            Vector charMove = tarVec - curVec;
+            double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
+            charMove_norm = charMove / charMove_length;
         }
 
         private double Angle(Point origin, Point target)
@@ -116,6 +137,9 @@ public partial class MainWindow : Window
             {
                 Point targetPoint = e.GetPosition(this);
 
+                Point charSize = new Point(snake.ActualWidth / 50, snake.ActualHeight / 50);
+
+                snake.RenderTransformOrigin = charSize;
                 snake.RenderTransform = rotate;
 
                 double y = Canvas.GetTop(snake) + snake.ActualWidth / 2.0;
@@ -130,22 +154,22 @@ public partial class MainWindow : Window
             }
         }
 
-        private void PaintBonus(int index)
+        /*private void PaintRocks(int index)
         {
-            //arvotaan omenalle piste eli X ja Y -koordinaatti
+            //arvotaan kivelle piste eli X ja Y -koordinaatti
             Point point = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
-            //omenan piirto
-             Ellipse omena = new Ellipse();
-             omena.Fill = Brushes.Gray;
-             omena.Width = rnd.Next(10, 40);
-             omena.Height = rnd.Next(10, 40);
-             Canvas.SetTop(omena, point.Y);
-             Canvas.SetLeft(omena, point.X);
-             paintCanvas.Children.Insert(index, omena);
-             bonusPoints.Insert(index, point); 
-        }
-        private void PaintSnake(Point currentpoint)
+            //kiven piirto
+             Ellipse rock = new Ellipse();
+             rock.Fill = Brushes.Gray;
+             rock.Width = rnd.Next(10, 40);
+             rock.Height = rnd.Next(10, 40);
+             Canvas.SetTop(rock, point.Y);
+             Canvas.SetLeft(rock, point.X);
+             paintCanvas.Children.Insert(index, rock);
+             rocks.Insert(index, Coordinates); 
+        }*/
+        private void PaintSnake(Vector currentpoint)
         {
             ImageBrush player = new ImageBrush();
             player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
@@ -182,24 +206,24 @@ public partial class MainWindow : Window
                     else
                         this.Close();
                     break;
-                /*case Key.Left:
-                    if (currentPosition.X > minimi)
-                    currentPosition.X -= characterWidth / 8;
+                    /*case Key.Left:
+                        if (currentPosition.X > minimi)
+                        currentPosition.X -= characterWidth / 8;
+                        break;*/
+                    case Key.Up:
+                        if (currentPosition.Y > minimi)
+                        currentPosition = currentPosition + charMove_norm * difficulty;
+                        break;
+                    /*case Key.Right:
+                        if (currentPosition.X < maxWidth)
+                        currentPosition.X += characterWidth / 8;
+                        break;*/
+                    case Key.Down:
+                        if (currentPosition.Y < maxHeight)
+                        currentPosition = currentPosition - charMove_norm * difficulty;
                     break;
-                case Key.Up:
-                    if (currentPosition.Y > minimi)
-                    currentPosition.Y -= characterWidth / 8;
-                    break;
-                case Key.Right:
-                    if (currentPosition.X < maxWidth)
-                    currentPosition.X += characterWidth / 8;
-                    break;
-                case Key.Down:
-                    if (currentPosition.Y < maxHeight)
-                    currentPosition.Y += characterWidth / 8;
-                    break;*/
             }
-           // lastDirection = currentDirection;
+            // lastDirection = currentDirection;
         }
 
         private void UpKeyPressed(object sender, KeyEventArgs e)
@@ -256,7 +280,7 @@ public partial class MainWindow : Window
             
             try
             {
-                foreach (Point point in bonusPoints)
+                foreach (Point point in rocks)
                 {
                     if ((Math.Abs(point.X - currentPosition.X) > characterWidth) &&
                        (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
