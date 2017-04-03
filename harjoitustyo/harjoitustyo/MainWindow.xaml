@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:harjoitustyo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800"
+        Title="MainWindow" Height="900" Width="1600"
         WindowStyle="None" Cursor="Cross">
     <Grid Background="Black">
-        <Canvas Name="paintCanvas" Background="WhiteSmoke"
-                HorizontalAlignment="Stretch" MaxWidth="780" MaxHeight="580">
+        <Canvas Name="paintCanvas"
+                HorizontalAlignment="Stretch" MaxWidth="1580" MaxHeight="880">
+            <Canvas.Background>
+                <ImageBrush ImageSource="Resources/snow_ground.jpg"/>
+            </Canvas.Background>
         </Canvas>
     </Grid>
 </Window>

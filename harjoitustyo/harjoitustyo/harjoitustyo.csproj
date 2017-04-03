@@ -116,7 +116,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\snow_ground.jpg" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\player.png" />
   </ItemGroup>

@@ -33,8 +33,8 @@ public partial class MainWindow : Window
     {
         //variables and consts
         private const int minimi = 5;
-        private const int maxHeight = 540;
-        private const int maxWidth = 740;
+        private const int maxHeight = 860;
+        private const int maxWidth = 1560;
         private const int characterWidth = 20;
         private int difficulty = 0; //timerin ajastin aika ms
         private List<Point> bonusPoints = new List<Point>(); //omenakokoelma
