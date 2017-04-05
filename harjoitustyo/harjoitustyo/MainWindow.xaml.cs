@@ -74,16 +74,12 @@ public partial class MainWindow : Window
 
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-            /*this.KeyDown += new KeyEventHandler(UpKeyPressed);
-            this.KeyDown += new KeyEventHandler(DownKeyPressed);
-            this.KeyDown += new KeyEventHandler(LeftKeyPressed);
-            this.KeyDown += new KeyEventHandler(RightKeyPressed);*/
             this.MouseMove += new MouseEventHandler(Rotate);
             this.MouseMove += new MouseEventHandler(charMove);
             this.MouseDown += new MouseButtonEventHandler(Shoot);
 
             //piirretään esteet ja pelaaja
-            //IniRocks();
+            IniRocks();
             PaintSnake(startingPoint);
             currentPosition = startingPoint;
             paintCanvas.Children.Add(snake);
@@ -98,9 +94,9 @@ public partial class MainWindow : Window
             {
                 try
                 {
-                    rock.PaintObstacle(n);
-                    paintCanvas.Children.Insert(rocks.Count, rock.Rock);
-                    rocks.Insert(rocks.Count, rock.Coordinates);
+                    PaintRocks(n);
+                    //paintCanvas.Children.Insert(rocks.Count, rock.Rock);
+                    //rocks.Insert(rocks.Count, rock.Coordinates);
                 }
                 catch (Exception ex)
                 {
@@ -192,23 +188,26 @@ public partial class MainWindow : Window
             {
                 MessageBox.Show(ex.Message);
             }
-        } 
+        }
 
-        /*private void PaintRocks(int index)
+        private void PaintRocks(int index)
         {
             //arvotaan kivelle piste eli X ja Y -koordinaatti
             Point point = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
             //kiven piirto
-             Ellipse rock = new Ellipse();
-             rock.Fill = Brushes.Gray;
-             rock.Width = rnd.Next(10, 40);
-             rock.Height = rnd.Next(10, 40);
-             Canvas.SetTop(rock, point.Y);
-             Canvas.SetLeft(rock, point.X);
-             paintCanvas.Children.Insert(index, rock);
-             rocks.Insert(index, Coordinates); 
-        }*/
+            Ellipse rock = new Ellipse();
+            ImageBrush rockImg = new ImageBrush();
+            rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
+            rock.Fill = rockImg;
+            rock.Width = rnd.Next(25, 100);
+            rock.Height = rnd.Next(25, 100);
+            Canvas.SetTop(rock, point.Y);
+            Canvas.SetLeft(rock, point.X);
+            paintCanvas.Children.Insert(index, rock);
+            rocks.Insert(index, point);
+        }
+
         private void PaintSnake(Vector currentpoint)
         {
             ImageBrush player = new ImageBrush();
@@ -286,54 +285,6 @@ public partial class MainWindow : Window
                     break;
             }
             // lastDirection = currentDirection;
-        }
-
-        private void UpKeyPressed(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                    if (currentPosition.Y > minimi)
-                        currentPosition.Y -= characterWidth / 8;
-                    break;
-            }
-            
-        }
-
-        private void DownKeyPressed(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Down:
-                    if (currentPosition.Y < maxHeight)
-                        currentPosition.Y += characterWidth / 8;
-                    break;
-            }
-
-        }
-
-        private void LeftKeyPressed(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Left:
-                    if (currentPosition.X > minimi)
-                        currentPosition.X -= characterWidth / 8;
-                    break;
-            }
-
-        }
-
-        private void RightKeyPressed(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Right:
-                    if (currentPosition.X < maxWidth)
-                        currentPosition.X += characterWidth / 8;
-                    break;
-            }
-
         }
 
         private void timer_Tick(object sender, EventArgs e)
