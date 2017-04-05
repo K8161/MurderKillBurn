@@ -48,6 +48,8 @@ public partial class MainWindow : Window
         private DispatcherTimer bulletTimer;
         Ellipse snake = new Ellipse();
         Ellipse bullet = new Ellipse();
+        Ellipse enemy1 = new Ellipse();
+        Ellipse enemy = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         RotateTransform rotateAngle = new RotateTransform();
         Vector charMove_norm;
@@ -88,6 +90,7 @@ public partial class MainWindow : Window
             PaintSnake(startingPoint);
             currentPosition = startingPoint;
             paintCanvas.Children.Add(snake);
+            paintCanvas.Children.Add(enemy1);
 
             //start game
             timer.Start();
@@ -118,11 +121,9 @@ public partial class MainWindow : Window
 
         public void charMove(object sender, MouseEventArgs e)
         {
-
             Point targ = e.GetPosition(paintCanvas);
             Vector tarVec = new Vector(targ.X, targ.Y);
             Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
-
 
             Vector charMove = tarVec - curVec;
             double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
@@ -146,7 +147,6 @@ public partial class MainWindow : Window
                           Vector bulletMove = targetVec - bulletVec;
                           double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2));
                           bulletMove_norm = bulletMove / bulletMove_length;
-
                           
                           bulletTimer.Start();
                             break;
@@ -227,23 +227,6 @@ public partial class MainWindow : Window
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
             Canvas.SetLeft(snake, currentpoint.X);
-            
-            int n = 0;
-            foreach (Point point in enemies)
-            {
-                if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
-                    (Math.Abs(point.Y - bulletPosition.Y) < 30))
-                {
-                    enemies.RemoveAt(n);
-                    paintCanvas.Children.RemoveAt(n);
-                    paintCanvas.Children.Remove(bullet);
-                    bulletTimer.Stop();
-                    PaintEnemy(n);
-                    playerone.Score += 100;
-                    break;
-                }
-                n++;
-            }
         }
 
         private void PaintBullet(Vector bulletPoint)
@@ -269,16 +252,16 @@ public partial class MainWindow : Window
 
         private void PaintEnemy(int index)
         {
-            //arvotaan kivelle piste eli X ja Y -koordinaatti
             Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
-            //kiven piirto
+            
             Ellipse enemy = new Ellipse();
             ImageBrush enemyImg = new ImageBrush();
             enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
             enemy.Fill = enemyImg;
             enemy.Width = 30;
             enemy.Height = 30;
+            
             Canvas.SetTop(enemy, enemyPoint.Y);
             Canvas.SetLeft(enemy, enemyPoint.X);
             paintCanvas.Children.Insert(index, enemy);
@@ -287,15 +270,14 @@ public partial class MainWindow : Window
 
         private void PaintEnemy1(Vector enemyPoint1)
         {
-            Ellipse enemy = new Ellipse();
+            //Ellipse enemy = new Ellipse();
             ImageBrush enemyImg = new ImageBrush();
             enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            enemy.Fill = enemyImg;
-            enemy.Width = 30;
-            enemy.Height = 30;
-            Canvas.SetTop(enemy, enemyPoint1.Y);
-            Canvas.SetLeft(enemy, enemyPoint1.X);
-            //paintCanvas.Children.Insert(index, enemy);
+            enemy1.Fill = enemyImg;
+            enemy1.Width = 30;
+            enemy1.Height = 30;
+            Canvas.SetTop(enemy1, enemyPoint1.Y);
+            Canvas.SetLeft(enemy1, enemyPoint1.X);
             //enemies.Insert(index, enemyPoint);
         }
 
@@ -344,14 +326,35 @@ public partial class MainWindow : Window
             Vector CurEnem = new Vector(enemyPoint1.X, enemyPoint1.Y);
             Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
 
-
             Vector EnemyMove = CurEnem - CurPlay;
             double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
             EnemyMove_norm = EnemyMove / EnemyMove_length;
             enemyPoint1 = enemyPoint1 - EnemyMove_norm * 0.7;
-
-
+            
             PaintEnemy1(enemyPoint1);
+
+            if ((Math.Abs(enemyPoint1.X - currentPosition.X) < 10) &&
+                (Math.Abs(enemyPoint1.Y - currentPosition.Y) < 10))
+            {
+                GameOver();
+            }
+
+            int n = 0;
+            foreach (Point point in enemies)
+            {
+                if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
+                    (Math.Abs(point.Y - bulletPosition.Y) < 30))
+                {
+                    enemies.RemoveAt(n);
+                    paintCanvas.Children.RemoveAt(n);
+                    paintCanvas.Children.Remove(bullet);
+                    bulletTimer.Stop();
+                    PaintEnemy(n);
+                    playerone.Score += 100;
+                    break;
+                }
+                n++;
+            }
 
             try
             {
@@ -456,8 +459,8 @@ public partial class MainWindow : Window
 
             catch (Exception ex)
             {
-                //Console.WriteLine("Some exception happened!");
-                Console.WriteLine(ex.Message); // Access to the path 'c:\test.file' is denied.
+                //("Some exception happened!");
+                MessageBox.Show(ex.Message);
             }
         }
     }
