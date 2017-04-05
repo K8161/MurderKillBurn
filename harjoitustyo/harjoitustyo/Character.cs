@@ -28,6 +28,7 @@ namespace harjoitustyo
         public int characterWidth { get; set; }
         private DispatcherTimer timer;
         public string Name { get; set; }
+        public string Score { get; set; }
         public int Hitpoints { get; set; }
         public bool HasWeapon { get; set; }
         public bool UsesAmmo { get; set; }

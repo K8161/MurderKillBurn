@@ -36,10 +36,13 @@ public partial class MainWindow : Window
         private const int maxHeight = 860;
         private const int maxWidth = 1560;
         private const int characterWidth = 20;
+        private const int bulletWidth = 15;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> rocks = new List<Point>(); //kivikokoelma
+        private List<Point> enemies = new List<Point>(); //kivikokoelma
         private List<Vector> bullets = new List<Vector>();
         private const int obstacleCount = 20;
+        private const int enemyCount = 12;
         //private List<Point> snakeParts = new List<Point>();
         private Vector startingPoint = new Vector(200, 100);
         private Vector currentPosition = new Vector();
@@ -57,9 +60,14 @@ public partial class MainWindow : Window
         Obstacle rock = new Obstacle();
         //Engine engine = new Engine();
 
+        Character playerone = new Character();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            btnOK.Visibility = Visibility.Hidden;
+            txtName.Visibility = Visibility.Hidden;
 
             //tarvittavat alustukset
             timer = new DispatcherTimer();
@@ -80,6 +88,7 @@ public partial class MainWindow : Window
 
             //piirretään esteet ja pelaaja
             IniRocks();
+            IniEnemies();
             PaintSnake(startingPoint);
             currentPosition = startingPoint;
             paintCanvas.Children.Add(snake);
@@ -102,6 +111,14 @@ public partial class MainWindow : Window
                 {
                     MessageBox.Show(ex.Message);
                 }
+            }
+        }
+
+        private void IniEnemies()
+        {
+            for (int n = 0; n < enemyCount; n++)
+            {
+                PaintEnemy(n);
             }
         }
 
@@ -217,16 +234,31 @@ public partial class MainWindow : Window
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
             Canvas.SetLeft(snake, currentpoint.X);
-            //int count = paintCanvas.Children.Count;
-            //paintCanvas.Children.Add(snake);
-            //snakeParts.Add(currentPosition);
-            //rajoitetaan käärmeen pituutta
-            //huom! bonusCount < snakeLength
-            /*if (count > characterWidth)
+
+            //TT#3
+            //tarkistetaan osuuko omenaan
+            int n = 0;
+            foreach (Point point in enemies)
             {
-                paintCanvas.Children.RemoveAt(count - characterWidth);
-                snakeParts.RemoveAt(count - characterWidth);
-            }*/
+                if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
+                    (Math.Abs(point.Y - bulletPosition.Y) < 30))
+                {
+                    //syödään omena
+                    //score += 10;
+                    //snakeLength += 1;
+                    //nopeutetaan peliä
+
+                    //this.Title = "SnakeWPF your score: " + score;
+                    enemies.RemoveAt(n);
+                    paintCanvas.Children.RemoveAt(n);
+                    paintCanvas.Children.Remove(bullet);
+                    bulletTimer.Stop();
+                    PaintEnemy(n);
+                    playerone.Score += 100;
+                    break;
+                }
+                n++;
+            }
         }
 
         private void PaintBullet(Vector bulletPoint)
@@ -236,8 +268,8 @@ public partial class MainWindow : Window
                 ImageBrush cannonball = new ImageBrush();
                 cannonball.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative));
                 bullet.Fill = cannonball;
-                bullet.Width = 15;
-                bullet.Height = 15;
+                bullet.Width = bulletWidth;
+                bullet.Height = bulletWidth;
                 Canvas.SetTop(bullet, bulletPoint.Y);
                 Canvas.SetLeft(bullet, bulletPoint.X);
                 //paintCanvas.Children.Insert(index, bullet);
@@ -248,6 +280,24 @@ public partial class MainWindow : Window
 
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void PaintEnemy(int index)
+        {
+            //arvotaan kivelle piste eli X ja Y -koordinaatti
+            Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
+                                    rnd.Next(minimi, maxHeight));
+            //kiven piirto
+            Ellipse enemy = new Ellipse();
+            ImageBrush enemyImg = new ImageBrush();
+            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+            enemy.Fill = enemyImg;
+            enemy.Width = 30;
+            enemy.Height = 30;
+            Canvas.SetTop(enemy, enemyPoint.Y);
+            Canvas.SetLeft(enemy, enemyPoint.X);
+            paintCanvas.Children.Insert(index, enemy);
+            enemies.Insert(index, enemyPoint);
         }
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
@@ -325,9 +375,8 @@ public partial class MainWindow : Window
         private void GameOver()
         {
             timer.Stop();
-            //MessageBox.Show("Your score: " + score);
-            //this.Close();
-            GameOverShow();
+            btnOK.Visibility = Visibility.Visible;
+            txtName.Visibility = Visibility.Visible;
         }
 
         private void GameOverShow()
@@ -340,6 +389,17 @@ public partial class MainWindow : Window
             trs.BeginAnimation(TranslateTransform.XProperty, anim);
             trs.BeginAnimation(TranslateTransform.YProperty, anim);
             paintCanvas.RenderTransform = trs;
+        }
+
+        private void btnOK_Click(object sender, RoutedEventArgs e)
+        {
+            if (txtName.Text == "Give Player Name" || txtName.Text == "")
+            { MessageBox.Show("Not valid name!"); }
+            else
+            {
+                playerone.Name = txtName.Text;
+                GameOverShow();
+            }
         }
     }
 }
