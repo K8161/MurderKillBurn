@@ -38,19 +38,23 @@ public partial class MainWindow : Window
         private const int characterWidth = 20;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> rocks = new List<Point>(); //kivikokoelma
+        private List<Vector> bullets = new List<Vector>();
         private const int obstacleCount = 20;
         //private List<Point> snakeParts = new List<Point>();
         private Vector startingPoint = new Vector(200, 100);
         private Vector currentPosition = new Vector();
+        private Vector bulletPosition = new Vector();
         //private Direction lastDirection = Direction.Right;
         //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
+        private DispatcherTimer bulletTimer;
         Ellipse snake = new Ellipse();
+        Ellipse bullet = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         Vector charMove_norm;
+        Vector bulletMove_norm;
         Obstacle rock = new Obstacle();
-
         //Engine engine = new Engine();
 
         public MainWindow()
@@ -63,6 +67,11 @@ public partial class MainWindow : Window
             timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
             timer.Tick += new EventHandler(timer_Tick);
 
+            bulletTimer = new DispatcherTimer();
+
+            bulletTimer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
+            bulletTimer.Tick += new EventHandler(bulletTimer_Tick);
+
             //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             /*this.KeyDown += new KeyEventHandler(UpKeyPressed);
@@ -71,6 +80,7 @@ public partial class MainWindow : Window
             this.KeyDown += new KeyEventHandler(RightKeyPressed);*/
             this.MouseMove += new MouseEventHandler(Rotate);
             this.MouseMove += new MouseEventHandler(charMove);
+            this.MouseDown += new MouseButtonEventHandler(Shoot);
 
             //piirretään esteet ja pelaaja
             //IniRocks();
@@ -112,6 +122,36 @@ public partial class MainWindow : Window
             charMove_norm = charMove / charMove_length;
         }
 
+        private void Shoot(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                switch (e.LeftButton)
+                {
+                    case MouseButtonState.Pressed:
+                          bulletPosition = currentPosition;
+                          Point target = e.GetPosition(paintCanvas);
+                          Vector targetVec = new Vector(target.X, target.Y);
+                          Vector bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
+
+                          paintCanvas.Children.Add(bullet);
+
+                          Vector bulletMove = targetVec - bulletVec;
+                          double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2));
+                          bulletMove_norm = bulletMove / bulletMove_length;
+
+                          
+                          bulletTimer.Start();
+                            break;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private double Angle(Point origin, Point target)
         {
             Vector vector = new Vector();
@@ -129,7 +169,7 @@ public partial class MainWindow : Window
             {
                 return -angle;
             }
-        }
+        } 
 
         private void Rotate(object sender, MouseEventArgs e)
         {
@@ -152,7 +192,7 @@ public partial class MainWindow : Window
             {
                 MessageBox.Show(ex.Message);
             }
-        }
+        } 
 
         /*private void PaintRocks(int index)
         {
@@ -189,6 +229,28 @@ public partial class MainWindow : Window
                 snakeParts.RemoveAt(count - characterWidth);
             }*/
         }
+
+        private void PaintBullet(Vector bulletPoint)
+        {
+            try
+            {
+                ImageBrush cannonball = new ImageBrush();
+                cannonball.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative));
+                bullet.Fill = cannonball;
+                bullet.Width = 15;
+                bullet.Height = 15;
+                Canvas.SetTop(bullet, bulletPoint.Y);
+                Canvas.SetLeft(bullet, bulletPoint.X);
+                //paintCanvas.Children.Insert(index, bullet);
+                //bullets.Insert(index, bulletPosition);
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
             //muutetaan suuntaa näppäimistön painalluksen mukaan
@@ -292,6 +354,20 @@ public partial class MainWindow : Window
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void bulletTimer_Tick(object sender, EventArgs e)
+        {
+            if (bulletPosition.Y > minimi && bulletPosition.Y < maxHeight 
+                && bulletPosition.X > minimi && bulletPosition.X < maxWidth)
+            {
+                bulletPosition = bulletPosition + bulletMove_norm * difficulty;
+                PaintBullet(bulletPosition);
+            }
+            else {
+                bulletTimer.Stop();
+                paintCanvas.Children.Remove(bullet);
             }
         }
 
