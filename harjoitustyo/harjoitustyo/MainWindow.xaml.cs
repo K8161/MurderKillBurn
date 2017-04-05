@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,13 +22,6 @@ namespace harjoitustyo
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /*public enum Direction
-    {
-        Up,
-        Right,
-        Down,
-        Left
-    }*/
 
 public partial class MainWindow : Window
     {
@@ -35,13 +29,13 @@ public partial class MainWindow : Window
         private const int minimi = 5;
         private const int maxHeight = 860;
         private const int maxWidth = 1560;
-        private const int characterWidth = 20;
+        private const int characterWidth = 30;
         private const int bulletWidth = 15;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> rocks = new List<Point>(); //kivikokoelma
         private List<Point> enemies = new List<Point>(); //kivikokoelma
         private List<Vector> bullets = new List<Vector>();
-        private const int obstacleCount = 20;
+        private const int obstacleCount = 10;
         private const int enemyCount = 12;
         //private List<Point> snakeParts = new List<Point>();
         private Vector startingPoint = new Vector(200, 100);
@@ -55,10 +49,12 @@ public partial class MainWindow : Window
         Ellipse snake = new Ellipse();
         Ellipse bullet = new Ellipse();
         RotateTransform rotate = new RotateTransform();
+        RotateTransform rotateAngle = new RotateTransform();
         Vector charMove_norm;
         Vector bulletMove_norm;
-        Obstacle rock = new Obstacle();
-        //Engine engine = new Engine();
+        private Vector enemySpawn = new Vector(600, 600);
+        Vector enemyPoint1;
+        Vector EnemyMove_norm;
 
         Character playerone = new Character();
 
@@ -104,8 +100,6 @@ public partial class MainWindow : Window
                 try
                 {
                     PaintRocks(n);
-                    //paintCanvas.Children.Insert(rocks.Count, rock.Rock);
-                    //rocks.Insert(rocks.Count, rock.Coordinates);
                 }
                 catch (Exception ex)
                 {
@@ -212,13 +206,12 @@ public partial class MainWindow : Window
             //arvotaan kivelle piste eli X ja Y -koordinaatti
             Point point = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
-            //kiven piirto
             Ellipse rock = new Ellipse();
+            rock.Width = rnd.Next(25, 100);
+            rock.Height = rnd.Next(25, 100);
             ImageBrush rockImg = new ImageBrush();
             rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
             rock.Fill = rockImg;
-            rock.Width = rnd.Next(25, 100);
-            rock.Height = rnd.Next(25, 100);
             Canvas.SetTop(rock, point.Y);
             Canvas.SetLeft(rock, point.X);
             paintCanvas.Children.Insert(index, rock);
@@ -234,21 +227,13 @@ public partial class MainWindow : Window
             snake.Height = characterWidth;
             Canvas.SetTop(snake, currentpoint.Y);
             Canvas.SetLeft(snake, currentpoint.X);
-
-            //TT#3
-            //tarkistetaan osuuko omenaan
+            
             int n = 0;
             foreach (Point point in enemies)
             {
                 if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
                     (Math.Abs(point.Y - bulletPosition.Y) < 30))
                 {
-                    //syödään omena
-                    //score += 10;
-                    //snakeLength += 1;
-                    //nopeutetaan peliä
-
-                    //this.Title = "SnakeWPF your score: " + score;
                     enemies.RemoveAt(n);
                     paintCanvas.Children.RemoveAt(n);
                     paintCanvas.Children.Remove(bullet);
@@ -300,6 +285,20 @@ public partial class MainWindow : Window
             enemies.Insert(index, enemyPoint);
         }
 
+        private void PaintEnemy1(Vector enemyPoint1)
+        {
+            Ellipse enemy = new Ellipse();
+            ImageBrush enemyImg = new ImageBrush();
+            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+            enemy.Fill = enemyImg;
+            enemy.Width = 30;
+            enemy.Height = 30;
+            Canvas.SetTop(enemy, enemyPoint1.Y);
+            Canvas.SetLeft(enemy, enemyPoint1.X);
+            //paintCanvas.Children.Insert(index, enemy);
+            //enemies.Insert(index, enemyPoint);
+        }
+
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
             //muutetaan suuntaa näppäimistön painalluksen mukaan
@@ -340,15 +339,29 @@ public partial class MainWindow : Window
         private void timer_Tick(object sender, EventArgs e)
         {
             PaintSnake(currentPosition);
-            
+
+            Vector Curplay = currentPosition;
+            Vector CurEnem = new Vector(enemyPoint1.X, enemyPoint1.Y);
+            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
+
+
+            Vector EnemyMove = CurEnem - CurPlay;
+            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
+            EnemyMove_norm = EnemyMove / EnemyMove_length;
+            enemyPoint1 = enemyPoint1 - EnemyMove_norm * 0.7;
+
+
+            PaintEnemy1(enemyPoint1);
+
             try
             {
                 foreach (Point point in rocks)
                 {
-                    if ((Math.Abs(point.X - currentPosition.X) > characterWidth) &&
-                       (Math.Abs(point.Y - currentPosition.Y) < characterWidth))
+                    if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
+                        (Math.Abs(point.Y - bulletPosition.Y) < 30))
                     {
-
+                        paintCanvas.Children.Remove(bullet);
+                        bulletTimer.Stop();
                     }
                 }
             }
@@ -375,14 +388,15 @@ public partial class MainWindow : Window
         private void GameOver()
         {
             timer.Stop();
+            bulletTimer.Stop();
             btnOK.Visibility = Visibility.Visible;
             txtName.Visibility = Visibility.Visible;
         }
 
         private void GameOverShow()
         {
-         //   txtMessage.Text = "Your score: " + score + "\npress Esc to quit";
-          //  paintCanvas.Children.Add(txtMessage);
+            //txtMessage.Text = "Your score: " + score + "\npress Esc to quit";
+            //paintCanvas.Children.Add(txtMessage);
             //animaatio joka siirtää kanvaasin
             var trs = new TranslateTransform();
             var anim = new DoubleAnimation(0, 620, TimeSpan.FromSeconds(15));
@@ -397,8 +411,53 @@ public partial class MainWindow : Window
             { MessageBox.Show("Not valid name!"); }
             else
             {
-                playerone.Name = txtName.Text;
-                GameOverShow();
+                try
+                {
+                    playerone.Name = txtName.Text;
+                    SaveScore();
+                    //txtMessage.Text = "Your score: " + score + "\npress Esc to quit";
+                    //paintCanvas.Children.Add(txtMessage);
+                    GameOverShow();
+                }
+                catch (Exception ex)
+                {
+
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void SaveScore()
+        {
+            string name = playerone.Name;
+            int finalscore = playerone.Score;
+            try
+            {
+                string path = "Scoreboard.txt";
+                // Tutkitaan onko tiedosto olemassa, ja jollei ole niin luodaan tiedosto, ja siihen kolme riviä
+                if (!File.Exists(path))
+                {
+                    // Create a file to write to.
+                    using (StreamWriter sw = File.CreateText(path))
+                    {
+                        sw.WriteLine("Name  Score  Date");
+                        sw.WriteLine(name + " " + finalscore + " " + DateTime.Now.ToString("dd-MM-yyyy"));
+                    }
+                }
+
+                else
+                {
+                    using (StreamWriter sw = File.AppendText(path))
+                    {
+                        sw.WriteLine(name + "  " + finalscore + "  " + DateTime.Now.ToString("dd-MM-yyyy"));
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Some exception happened!");
+                Console.WriteLine(ex.Message); // Access to the path 'c:\test.file' is denied.
             }
         }
     }

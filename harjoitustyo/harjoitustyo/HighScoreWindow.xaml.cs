@@ -22,6 +22,21 @@ namespace harjoitustyo
         public HighScoreWindow()
         {
             InitializeComponent();
+            ReadScore();
+        }
+
+        public void ReadScore()
+        {
+            try
+            {
+                string scores = System.IO.File.ReadAllText("Scoreboard.txt");
+                System.Console.WriteLine(scores);
+                txbScoreboard.Text = scores;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void btnHighScore_Click(object sender, RoutedEventArgs e)
