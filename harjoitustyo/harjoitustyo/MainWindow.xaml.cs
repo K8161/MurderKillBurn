@@ -33,9 +33,9 @@ public partial class MainWindow : Window
         private const int bulletWidth = 15;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> rocks = new List<Point>(); //kivikokoelma
-        private List<Point> enemies = new List<Point>(); //kivikokoelma
+        private List<Point> enemies = new List<Point>(); //viholliskokoelma
         private List<Vector> bullets = new List<Vector>();
-        private const int obstacleCount = 10;
+        private const int obstacleCount = 15;
         private const int enemyCount = 12;
         //private List<Point> snakeParts = new List<Point>();
         private Vector startingPoint = new Vector(200, 100);
@@ -46,8 +46,8 @@ public partial class MainWindow : Window
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
-        Ellipse snake = new Ellipse();
         Ellipse bullet = new Ellipse();
+        Ellipse snake = new Ellipse();
         Ellipse enemy1 = new Ellipse();
         Ellipse enemy = new Ellipse();
         RotateTransform rotate = new RotateTransform();
@@ -57,6 +57,8 @@ public partial class MainWindow : Window
         private Vector enemySpawn = new Vector(600, 600);
         Vector enemyPoint1;
         Vector EnemyMove_norm;
+        int MagazineSize = 10;
+        Ellipse rock;
 
         Character playerone = new Character();
 
@@ -66,6 +68,8 @@ public partial class MainWindow : Window
 
             btnOK.Visibility = Visibility.Hidden;
             txtName.Visibility = Visibility.Hidden;
+            txbMag.Visibility = Visibility.Visible;
+            txbScore.Visibility = Visibility.Visible;
 
             //tarvittavat alustukset
             timer = new DispatcherTimer();
@@ -137,24 +141,37 @@ public partial class MainWindow : Window
                 switch (e.LeftButton)
                 {
                     case MouseButtonState.Pressed:
+                        
                           bulletPosition = currentPosition;
                           Point target = e.GetPosition(paintCanvas);
                           Vector targetVec = new Vector(target.X, target.Y);
                           Vector bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
 
-                          paintCanvas.Children.Add(bullet);
+                        if (MagazineSize > 0)
+                        {
+                            paintCanvas.Children.Add(bullet);
+                            bulletTimer.Start();
+                            MagazineSize--;
+                            txbMag.Text = "Ammo left: " + Convert.ToString(MagazineSize);
+                        }
+
+                        else
+                        {
+                            txbMag.Text = " Ammo left: Reloading...";
+                            MagazineSize = 10;
+                        }
+                          //paintCanvas.Children.Add(bullet);
 
                           Vector bulletMove = targetVec - bulletVec;
-                          double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2));
+                          double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
                           bulletMove_norm = bulletMove / bulletMove_length;
                           
-                          bulletTimer.Start();
+                          //bulletTimer.Start();
                             break;
                 }
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }
@@ -206,7 +223,8 @@ public partial class MainWindow : Window
             //arvotaan kivelle piste eli X ja Y -koordinaatti
             Point point = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
-            Ellipse rock = new Ellipse();
+
+            rock = new Ellipse();
             rock.Width = rnd.Next(25, 100);
             rock.Height = rnd.Next(25, 100);
             ImageBrush rockImg = new ImageBrush();
@@ -270,7 +288,9 @@ public partial class MainWindow : Window
 
         private void PaintEnemy1(Vector enemyPoint1)
         {
+            //PaintEnemy(0);
             //Ellipse enemy = new Ellipse();
+            
             ImageBrush enemyImg = new ImageBrush();
             enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
             enemy1.Fill = enemyImg;
@@ -278,7 +298,7 @@ public partial class MainWindow : Window
             enemy1.Height = 30;
             Canvas.SetTop(enemy1, enemyPoint1.Y);
             Canvas.SetLeft(enemy1, enemyPoint1.X);
-            //enemies.Insert(index, enemyPoint);
+            //enemies.Insert(index, enemySpawnPoint);
         }
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
@@ -351,6 +371,7 @@ public partial class MainWindow : Window
                     bulletTimer.Stop();
                     PaintEnemy(n);
                     playerone.Score += 100;
+                    txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
                     break;
                 }
                 n++;

@@ -14,8 +14,13 @@
                 <ImageBrush ImageSource="Resources/snow_ground.jpg"/>
 
             </Canvas.Background>
+            
             <TextBox x:Name="txtName" Height="74" Canvas.Left="563" TextWrapping="Wrap" Text="Give Player Name" Canvas.Top="331" Width="357" FontSize="25" Cursor="Pen"/>
             <Button x:Name="btnOK" Content="OK" Height="53" Canvas.Left="661" Canvas.Top="434" Width="161" FontSize="25" Click="btnOK_Click" Cursor="Arrow"/>
+            
+            <TextBlock x:Name="txbMag" Canvas.Left="1250" TextWrapping="Wrap" FontSize="30" Text="Ammo left:  " Canvas.Top="20"/>
+            <TextBlock x:Name="txbScore" Canvas.Left="20" TextWrapping="Wrap" FontSize="30" Text="Score:  " Canvas.Top="20"/>
+
         </Canvas>
     </Grid>
 </Window>
