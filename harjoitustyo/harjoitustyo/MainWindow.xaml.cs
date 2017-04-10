@@ -38,8 +38,8 @@ public partial class MainWindow : Window
         private const int obstacleCount = 15;
         private const int enemyCount = 12;
         //private List<Point> snakeParts = new List<Point>();
-        private Vector startingPoint = new Vector(200, 100);
-        private Vector currentPosition = new Vector();
+        //private Vector startingPoint = new Vector(200, 100);
+        //private Vector currentPosition = new Vector();
         private Vector bulletPosition = new Vector();
         //private Direction lastDirection = Direction.Right;
         //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
@@ -47,19 +47,20 @@ public partial class MainWindow : Window
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
         Ellipse bullet = new Ellipse();
-        Ellipse enemy1 = new Ellipse();
-        Ellipse enemy = new Ellipse();
+        //Ellipse enemy = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         RotateTransform rotateAngle = new RotateTransform();
         Vector charMove_norm;
         Vector bulletMove_norm;
         private Vector enemySpawn = new Vector(600, 600);
-        Vector enemyPoint1;
+        Vector movingMonsterPoint;
         Vector EnemyMove_norm;
         int MagazineSize = 10;
         Ellipse rock;
 
         Player playerone = new Player();
+        Enemy movingMonster = new Enemy();
+        Obstacle stone = new Obstacle();
 
         public MainWindow()
         {
@@ -93,10 +94,10 @@ public partial class MainWindow : Window
                 //piirretään esteet ja pelaaja
                 IniRocks();
                 IniEnemies();
-                PaintPlayerOne(startingPoint);
-                currentPosition = startingPoint;
+                PaintPlayerOne(playerone.startingPoint);
+                playerone.currentPosition = playerone.startingPoint;
                 paintCanvas.Children.Add(playerone.character);
-                paintCanvas.Children.Add(enemy1);
+                paintCanvas.Children.Add(movingMonster.monster);
 
                 //start game
                 timer.Start();
@@ -135,7 +136,7 @@ public partial class MainWindow : Window
         {
             Point targ = e.GetPosition(paintCanvas);
             Vector tarVec = new Vector(targ.X, targ.Y);
-            Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
+            Vector curVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y);
 
             Vector charMove = tarVec - curVec;
             double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
@@ -150,10 +151,10 @@ public partial class MainWindow : Window
                 {
                     case MouseButtonState.Pressed:
                         
-                          bulletPosition = currentPosition;
+                          bulletPosition = playerone.currentPosition;
                           Point target = e.GetPosition(paintCanvas);
                           Vector targetVec = new Vector(target.X, target.Y);
-                          Vector bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
+                          Vector bulletVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y); ;
 
                         if (MagazineSize > 0)
                         {
@@ -174,7 +175,7 @@ public partial class MainWindow : Window
                           double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
                           bulletMove_norm = bulletMove / bulletMove_length;
                           
-                          //bulletTimer.Start();
+                          bulletTimer.Start();
                             break;
                 }
             }
@@ -184,7 +185,7 @@ public partial class MainWindow : Window
             }
         }
 
-        private double Angle(Point origin, Point target)
+      /*  private double Angle(Point origin, Point target)
         {
             Vector vector = new Vector();
             vector.X = target.X - origin.X;
@@ -201,7 +202,7 @@ public partial class MainWindow : Window
             {
                 return -angle;
             }
-        } 
+        } */
 
         private void Rotate(object sender, MouseEventArgs e)
         {
@@ -218,7 +219,7 @@ public partial class MainWindow : Window
                 double x = Canvas.GetLeft(playerone.character) + playerone.character.ActualHeight / 2.0;
                 Point originPoint = new Point(x, y);
 
-                rotate.Angle = Angle(originPoint, targetPoint);
+                rotate.Angle = playerone.Angle(originPoint, targetPoint);
             }
             catch (Exception ex)
             {
@@ -229,15 +230,16 @@ public partial class MainWindow : Window
         private void PaintRocks(int index)
         {
             //arvotaan kivelle piste eli X ja Y -koordinaatti
-            Point point = new Point(rnd.Next(minimi, maxWidth),
-                                    rnd.Next(minimi, maxHeight));
+               Point point = new Point(rnd.Next(minimi, maxWidth),
+                                       rnd.Next(minimi, maxHeight));
 
-            rock = new Ellipse();
-            rock.Width = rnd.Next(25, 100);
-            rock.Height = rnd.Next(25, 100);
-            ImageBrush rockImg = new ImageBrush();
-            rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
-            rock.Fill = rockImg;
+               rock = new Ellipse();
+               rock.Width = rnd.Next(25, 100);
+               rock.Height = rnd.Next(25, 100);
+               ImageBrush rockImg = new ImageBrush();
+               rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
+               rock.Fill = rockImg; 
+            //stone.PaintRocks();
             Canvas.SetTop(rock, point.Y);
             Canvas.SetLeft(rock, point.X);
             paintCanvas.Children.Insert(index, rock);
@@ -290,18 +292,11 @@ public partial class MainWindow : Window
             enemies.Insert(index, enemyPoint);
         }
 
-        private void PaintEnemy1(Vector enemyPoint1)
+        private void PaintMovingMonster(Vector enemyPoint1)
         {
-            //PaintEnemy(0);
-            //Ellipse enemy = new Ellipse();
-            
-            ImageBrush enemyImg = new ImageBrush();
-            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            enemy1.Fill = enemyImg;
-            enemy1.Width = 30;
-            enemy1.Height = 30;
-            Canvas.SetTop(enemy1, enemyPoint1.Y);
-            Canvas.SetLeft(enemy1, enemyPoint1.X);
+            movingMonster.PaintMonster();
+            Canvas.SetTop(movingMonster.monster, movingMonsterPoint.Y);
+            Canvas.SetLeft(movingMonster.monster, movingMonsterPoint.X);
             //enemies.Insert(index, enemySpawnPoint);
         }
 
@@ -327,16 +322,16 @@ public partial class MainWindow : Window
                         currentPosition.X -= characterWidth / 8;
                         break;*/
                     case Key.Up:
-                        if (currentPosition.Y > minimi)
-                        currentPosition = currentPosition + charMove_norm * difficulty;
+                        if (playerone.currentPosition.Y > minimi)
+                        playerone.currentPosition = playerone.currentPosition + charMove_norm * difficulty;
                         break;
                     /*case Key.Right:
                         if (currentPosition.X < maxWidth)
                         currentPosition.X += characterWidth / 8;
                         break;*/
                     case Key.Down:
-                        if (currentPosition.Y < maxHeight)
-                        currentPosition = currentPosition - charMove_norm * difficulty;
+                        if (playerone.currentPosition.Y < maxHeight)
+                        playerone.currentPosition = playerone.currentPosition - charMove_norm * difficulty;
                     break;
             }
             // lastDirection = currentDirection;
@@ -344,21 +339,21 @@ public partial class MainWindow : Window
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            PaintPlayerOne(currentPosition);
+            PaintPlayerOne(playerone.currentPosition);
 
-            Vector Curplay = currentPosition;
-            Vector CurEnem = new Vector(enemyPoint1.X, enemyPoint1.Y);
+            Vector Curplay = playerone.currentPosition;
+            Vector CurEnem = new Vector(movingMonsterPoint.X, movingMonsterPoint.Y);
             Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
 
             Vector EnemyMove = CurEnem - CurPlay;
             double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
             EnemyMove_norm = EnemyMove / EnemyMove_length;
-            enemyPoint1 = enemyPoint1 - EnemyMove_norm * 0.7;
+            movingMonsterPoint = movingMonsterPoint - EnemyMove_norm * 0.7;
             
-            PaintEnemy1(enemyPoint1);
+            PaintMovingMonster(movingMonsterPoint);
 
-            if ((Math.Abs(enemyPoint1.X - currentPosition.X) < 10) &&
-                (Math.Abs(enemyPoint1.Y - currentPosition.Y) < 10))
+            if ((Math.Abs(movingMonsterPoint.X - playerone.currentPosition.X) < 10) &&
+                (Math.Abs(movingMonsterPoint.Y - playerone.currentPosition.Y) < 10))
             {
                 GameOver();
             }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace harjoitustyo
@@ -15,47 +16,28 @@ namespace harjoitustyo
         private const int minimi = 10;
         private const int maxHeight = 860;
         private const int maxWidth = 1560;
+        private const int obstacleCount = 12;
         private List<Point> rocks = new List<Point>();
         public int Height { get; set; }
         public int Width { get; set; }
-        private Point coordinates;
+        private Random rnd = new Random();
 
-        public Point Coordinates
+        public void PaintRocks()
         {
-            get { return coordinates; }
-            set
-            {
-                if (coordinates.X < maxWidth && coordinates.Y < maxHeight ||
-                    coordinates.X > minimi && coordinates.Y > minimi)
-                {
-                    coordinates = value;
-                }
-            }
-        }
+            //arvotaan kivelle piste eli X ja Y -koordinaatti
+            Point point = new Point(rnd.Next(minimi, maxWidth),
+                                    rnd.Next(minimi, maxHeight));
 
-        public Ellipse Rock { get; set; }
-        public Random rnd { get; set; }
-
-
-        public void PaintObstacle(int index)
-        {
-            try
-            {
-                Coordinates = new Point(rnd.Next(minimi, maxWidth),
-                                       rnd.Next(minimi, maxHeight));
-                Rock = new Ellipse();
-                Rock.Fill = Brushes.Gray;
-                Rock.Width = rnd.Next(10, 40);
-                Rock.Height = rnd.Next(10, 40);
-                Canvas.SetTop(Rock, Coordinates.Y);
-                Canvas.SetLeft(Rock, Coordinates.X);
-                //paintCanvas.Children.Insert(index, Coordinates);
-                rocks.Insert(index, Coordinates);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            Ellipse rock = new Ellipse();
+            rock.Width = rnd.Next(25, 100);
+            rock.Height = rnd.Next(25, 100);
+            ImageBrush rockImg = new ImageBrush();
+            rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
+            rock.Fill = rockImg;
+        /*    Canvas.SetTop(rock, point.Y);
+            Canvas.SetLeft(rock, point.X);
+            //paintCanvas.Children.Insert(index, rock);
+            rocks.Insert(index, point); */
         }
 
     }

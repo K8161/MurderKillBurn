@@ -26,7 +26,6 @@ namespace harjoitustyo
         public Point point { get; set; }
 
         public int characterWidth = 30;
-        private DispatcherTimer timer;
         public string Name { get; set; }
         public int Hitpoints { get; set; }
         public bool HasWeapon { get; set; }
@@ -91,9 +90,15 @@ namespace harjoitustyo
         public int ScoreValue { get; set; }
         public int Accuracy { get; set; }
 
-        public void AttackPlayer()
-        {
+        public Ellipse monster = new Ellipse();
 
+        public void PaintMonster()
+        {
+            ImageBrush player = new ImageBrush();
+            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+            monster.Fill = player;
+            monster.Width = characterWidth;
+            monster.Height = characterWidth;
         }
     }
 
@@ -105,6 +110,9 @@ namespace harjoitustyo
 
         public Ellipse character = new Ellipse();
 
+        public Vector startingPoint = new Vector(200, 100);
+        public Vector currentPosition = new Vector();
+
         public void PaintPlayer()
         {
             ImageBrush player = new ImageBrush();
@@ -114,6 +122,24 @@ namespace harjoitustyo
             character.Height = characterWidth;
         }
 
+        public double Angle(Point origin, Point target)
+        {
+            Vector vector = new Vector();
+            vector.X = target.X - origin.X;
+            vector.Y = target.Y - origin.Y;
+            vector.Normalize();
+            double dotAngle = -vector.Y;
+            double angle = Math.Acos(dotAngle);
+            angle = angle * 180 / Math.PI;
+            if (vector.X > 0)
+            {
+                return angle;
+            }
+            else
+            {
+                return -angle;
+            }
+        }
         public void ExitWhenDead()
         {
 
