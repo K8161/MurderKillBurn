@@ -90,7 +90,12 @@ namespace harjoitustyo
         public int ScoreValue { get; set; }
         public int Accuracy { get; set; }
 
+        public Ellipse enemy = new Ellipse();
+
         public Ellipse monster = new Ellipse();
+        Random rnd = new Random();
+
+        //List<Object> Enemies = new List<object>();
 
         public void PaintMonster()
         {
@@ -100,6 +105,32 @@ namespace harjoitustyo
             monster.Width = characterWidth;
             monster.Height = characterWidth;
         }
+
+        public void CreateEnemy()
+        {
+        //Enemy zombie = new Enemy();
+        //zombie.PaintEnemy();
+        //Enemies.Add(zombie);
+        }
+
+        public void PaintEnemy()
+        {
+            //Enemy zombie = new Enemy();
+            //enemyPoint = new Point(rnd.Next(MainWindow.minimi, MainWindow.maxWidth),
+                                    //rnd.Next(MainWindow.minimi, MainWindow.maxHeight));
+            //Ellipse enemy = new Ellipse();
+            ImageBrush enemyImg = new ImageBrush();
+            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+            enemy.Fill = enemyImg;
+            enemy.Width = 30;
+            enemy.Height = 30;
+
+            /* Canvas.SetTop(enemy, enemyPoint.Y);
+            Canvas.SetLeft(enemy, enemyPoint.X);
+            paintCanvas.Children.Insert(index, enemy);
+            enemies.Insert(index, enemyPoint); */
+        }
+
     }
 
     class Player : Character

@@ -26,15 +26,16 @@ namespace harjoitustyo
 public partial class MainWindow : Window
     {
         //variables and consts
-        private const int minimi = 5;
-        private const int maxHeight = 860;
-        private const int maxWidth = 1560;
+        public const int minimi = 5;
+        public const int maxHeight = 860;
+        public const int maxWidth = 1560;
         private const int characterWidth = 30;
         private const int bulletWidth = 15;
         private int difficulty = 5; //timerin ajastin aika ms
         private List<Point> rocks = new List<Point>(); //kivikokoelma
         private List<Point> enemies = new List<Point>(); //viholliskokoelma
         private List<Vector> bullets = new List<Vector>();
+        List<Enemy> Enemies = new List<Enemy>();
         private const int obstacleCount = 15;
         private const int enemyCount = 12;
         private Vector bulletPosition = new Vector();
@@ -44,6 +45,7 @@ public partial class MainWindow : Window
         Ellipse bullet = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         RotateTransform rotateAngle = new RotateTransform();
+        Point testi = new Point();
         Vector charMove_norm;
         Vector bulletMove_norm;
         private Vector enemySpawn = new Vector(600, 600);
@@ -124,7 +126,19 @@ public partial class MainWindow : Window
             {
                 PaintEnemy(n);
             }
-        }
+        } 
+
+      /*  public void IniEnemies()
+        {
+
+            for (int j = 0; j < 12; j++)
+            {
+                Enemy zombie = new Enemy();
+                zombie.PaintEnemy();
+                Enemies.Add(zombie);
+                PaintEnemy(j);
+            }
+        } */
 
         public void charMove(object sender, MouseEventArgs e)
         {
@@ -139,43 +153,46 @@ public partial class MainWindow : Window
 
         private void Shoot(object sender, MouseButtonEventArgs e)
         {
-            try
+            if (timer.IsEnabled)
             {
-                switch (e.LeftButton)
+                try
                 {
-                    case MouseButtonState.Pressed:
-                        
-                          bulletPosition = playerone.currentPosition;
-                          Point target = e.GetPosition(paintCanvas);
-                          Vector targetVec = new Vector(target.X, target.Y);
-                          Vector bulletVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y); ;
+                    switch (e.LeftButton)
+                    {
+                        case MouseButtonState.Pressed:
 
-                        if (MagazineSize > 0)
-                        {
-                            paintCanvas.Children.Add(bullet);
+                            bulletPosition = playerone.currentPosition;
+                            Point target = e.GetPosition(paintCanvas);
+                            Vector targetVec = new Vector(target.X, target.Y);
+                            Vector bulletVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y); ;
+
+                            if (MagazineSize > 0)
+                            {
+                                paintCanvas.Children.Add(bullet);
+                                bulletTimer.Start();
+                                MagazineSize--;
+                                txbMag.Text = "Ammo left: " + Convert.ToString(MagazineSize);
+                            }
+
+                            else
+                            {
+                                txbMag.Text = " Ammo left: Reloading...";
+                                MagazineSize = 10;
+                            }
+                            //paintCanvas.Children.Add(bullet);
+
+                            Vector bulletMove = targetVec - bulletVec;
+                            double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
+                            bulletMove_norm = bulletMove / bulletMove_length;
+
                             bulletTimer.Start();
-                            MagazineSize--;
-                            txbMag.Text = "Ammo left: " + Convert.ToString(MagazineSize);
-                        }
-
-                        else
-                        {
-                            txbMag.Text = " Ammo left: Reloading...";
-                            MagazineSize = 10;
-                        }
-                          //paintCanvas.Children.Add(bullet);
-
-                          Vector bulletMove = targetVec - bulletVec;
-                          double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
-                          bulletMove_norm = bulletMove / bulletMove_length;
-                          
-                          bulletTimer.Start();
                             break;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
@@ -249,18 +266,28 @@ public partial class MainWindow : Window
             }
         }
 
+     /*   private void SpawnEnemies()
+        {
+            for (int j=0; j<=enemyCount;j++)
+            {
+                Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
+                                   rnd.Next(minimi, maxHeight));
+                ene
+            }
+        } */
+
         private void PaintEnemy(int index)
         {
             Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
                                     rnd.Next(minimi, maxHeight));
-            
+
             Ellipse enemy = new Ellipse();
             ImageBrush enemyImg = new ImageBrush();
             enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
             enemy.Fill = enemyImg;
             enemy.Width = 30;
             enemy.Height = 30;
-            
+
             Canvas.SetTop(enemy, enemyPoint.Y);
             Canvas.SetLeft(enemy, enemyPoint.X);
             paintCanvas.Children.Insert(index, enemy);
@@ -272,7 +299,6 @@ public partial class MainWindow : Window
             movingMonster.PaintMonster();
             Canvas.SetTop(movingMonster.monster, movingMonsterPoint.Y);
             Canvas.SetLeft(movingMonster.monster, movingMonsterPoint.X);
-            //enemies.Insert(index, enemySpawnPoint);
         }
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
