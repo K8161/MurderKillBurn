@@ -28,7 +28,6 @@ namespace harjoitustyo
         public int characterWidth = 30;
         private DispatcherTimer timer;
         public string Name { get; set; }
-        public int Score { get; set; }
         public int Hitpoints { get; set; }
         public bool HasWeapon { get; set; }
         public bool UsesAmmo { get; set; }
@@ -106,11 +105,6 @@ namespace harjoitustyo
 
         public Ellipse character = new Ellipse();
 
-        /*   public Player (string name)
-             {
-                 Name = name;
-             } */
-
         public void PaintPlayer()
         {
             ImageBrush player = new ImageBrush();
@@ -118,11 +112,6 @@ namespace harjoitustyo
             character.Fill = player;
             character.Width = characterWidth;
             character.Height = characterWidth;
-        }
-
-        public void GainScore()
-        {
-
         }
 
         public void ExitWhenDead()

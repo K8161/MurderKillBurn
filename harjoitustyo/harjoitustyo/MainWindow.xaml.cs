@@ -47,7 +47,6 @@ public partial class MainWindow : Window
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
         Ellipse bullet = new Ellipse();
-        Ellipse snake = new Ellipse();
         Ellipse enemy1 = new Ellipse();
         Ellipse enemy = new Ellipse();
         RotateTransform rotate = new RotateTransform();
@@ -94,7 +93,7 @@ public partial class MainWindow : Window
                 //piirretään esteet ja pelaaja
                 IniRocks();
                 IniEnemies();
-                PaintSnake(startingPoint);
+                PaintPlayerOne(startingPoint);
                 currentPosition = startingPoint;
                 paintCanvas.Children.Add(playerone.character);
                 paintCanvas.Children.Add(enemy1);
@@ -245,13 +244,8 @@ public partial class MainWindow : Window
             rocks.Insert(index, point);
         }
 
-        private void PaintSnake(Vector currentpoint)
+        private void PaintPlayerOne(Vector currentpoint)
         {
-            /*ImageBrush player = new ImageBrush();
-            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
-            snake.Fill = player;
-            snake.Width = characterWidth;
-            snake.Height = characterWidth; */
             playerone.PaintPlayer();
             Canvas.SetTop(playerone.character, currentpoint.Y);
             Canvas.SetLeft(playerone.character, currentpoint.X);
@@ -350,7 +344,7 @@ public partial class MainWindow : Window
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            PaintSnake(currentPosition);
+            PaintPlayerOne(currentPosition);
 
             Vector Curplay = currentPosition;
             Vector CurEnem = new Vector(enemyPoint1.X, enemyPoint1.Y);
