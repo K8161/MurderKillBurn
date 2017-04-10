@@ -37,17 +37,11 @@ public partial class MainWindow : Window
         private List<Vector> bullets = new List<Vector>();
         private const int obstacleCount = 15;
         private const int enemyCount = 12;
-        //private List<Point> snakeParts = new List<Point>();
-        //private Vector startingPoint = new Vector(200, 100);
-        //private Vector currentPosition = new Vector();
         private Vector bulletPosition = new Vector();
-        //private Direction lastDirection = Direction.Right;
-        //private Direction currentDirection = Direction.Right; //alussa lähtee aina oikealle
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
         Ellipse bullet = new Ellipse();
-        //Ellipse enemy = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         RotateTransform rotateAngle = new RotateTransform();
         Vector charMove_norm;
@@ -184,25 +178,6 @@ public partial class MainWindow : Window
                 MessageBox.Show(ex.Message);
             }
         }
-
-      /*  private double Angle(Point origin, Point target)
-        {
-            Vector vector = new Vector();
-            vector.X = target.X - origin.X;
-            vector.Y = target.Y - origin.Y;
-            vector.Normalize();
-            double dotAngle = -vector.Y;
-            double angle = Math.Acos(dotAngle);
-            angle = angle * 180 / Math.PI;
-            if (vector.X > 0)
-            {
-                return angle;
-            }
-            else
-            {
-                return -angle;
-            }
-        } */
 
         private void Rotate(object sender, MouseEventArgs e)
         {
