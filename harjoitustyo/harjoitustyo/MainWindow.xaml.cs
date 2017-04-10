@@ -60,44 +60,53 @@ public partial class MainWindow : Window
         int MagazineSize = 10;
         Ellipse rock;
 
-        Character playerone = new Character();
+        Player playerone = new Player();
 
         public MainWindow()
         {
-            InitializeComponent();
+            try
+            {
 
-            btnOK.Visibility = Visibility.Hidden;
-            txtName.Visibility = Visibility.Hidden;
-            txbMag.Visibility = Visibility.Visible;
-            txbScore.Visibility = Visibility.Visible;
+                InitializeComponent();
 
-            //tarvittavat alustukset
-            timer = new DispatcherTimer();
-            
-            timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
-            timer.Tick += new EventHandler(timer_Tick);
+                btnOK.Visibility = Visibility.Hidden;
+                txtName.Visibility = Visibility.Hidden;
+                txbMag.Visibility = Visibility.Visible;
+                txbScore.Visibility = Visibility.Visible;
 
-            bulletTimer = new DispatcherTimer();
+                //tarvittavat alustukset
+                timer = new DispatcherTimer();
 
-            bulletTimer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
-            bulletTimer.Tick += new EventHandler(bulletTimer_Tick);
+                timer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
+                timer.Tick += new EventHandler(timer_Tick);
 
-            //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
-            this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-            this.MouseMove += new MouseEventHandler(Rotate);
-            this.MouseMove += new MouseEventHandler(charMove);
-            this.MouseDown += new MouseButtonEventHandler(Shoot);
+                bulletTimer = new DispatcherTimer();
 
-            //piirretään esteet ja pelaaja
-            IniRocks();
-            IniEnemies();
-            PaintSnake(startingPoint);
-            currentPosition = startingPoint;
-            paintCanvas.Children.Add(snake);
-            paintCanvas.Children.Add(enemy1);
+                bulletTimer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
+                bulletTimer.Tick += new EventHandler(bulletTimer_Tick);
 
-            //start game
-            timer.Start();
+                //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
+                this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
+                this.MouseMove += new MouseEventHandler(Rotate);
+                this.MouseMove += new MouseEventHandler(charMove);
+                this.MouseDown += new MouseButtonEventHandler(Shoot);
+
+                //piirretään esteet ja pelaaja
+                IniRocks();
+                IniEnemies();
+                PaintSnake(startingPoint);
+                currentPosition = startingPoint;
+                paintCanvas.Children.Add(playerone.character);
+                paintCanvas.Children.Add(enemy1);
+
+                //start game
+                timer.Start();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void IniRocks()
@@ -201,13 +210,13 @@ public partial class MainWindow : Window
             {
                 Point targetPoint = e.GetPosition(this);
 
-                Point charSize = new Point(snake.ActualWidth / 50, snake.ActualHeight / 50);
+                Point charSize = new Point(playerone.character.ActualWidth / 50, playerone.character.ActualHeight / 50);
 
-                snake.RenderTransformOrigin = charSize;
-                snake.RenderTransform = rotate;
+                playerone.character.RenderTransformOrigin = charSize;
+                playerone.character.RenderTransform = rotate;
 
-                double y = Canvas.GetTop(snake) + snake.ActualWidth / 2.0;
-                double x = Canvas.GetLeft(snake) + snake.ActualHeight / 2.0;
+                double y = Canvas.GetTop(playerone.character) + playerone.character.ActualWidth / 2.0;
+                double x = Canvas.GetLeft(playerone.character) + playerone.character.ActualHeight / 2.0;
                 Point originPoint = new Point(x, y);
 
                 rotate.Angle = Angle(originPoint, targetPoint);
@@ -238,13 +247,14 @@ public partial class MainWindow : Window
 
         private void PaintSnake(Vector currentpoint)
         {
-            ImageBrush player = new ImageBrush();
+            /*ImageBrush player = new ImageBrush();
             player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
             snake.Fill = player;
             snake.Width = characterWidth;
-            snake.Height = characterWidth;
-            Canvas.SetTop(snake, currentpoint.Y);
-            Canvas.SetLeft(snake, currentpoint.X);
+            snake.Height = characterWidth; */
+            playerone.PaintPlayer();
+            Canvas.SetTop(playerone.character, currentpoint.Y);
+            Canvas.SetLeft(playerone.character, currentpoint.X);
         }
 
         private void PaintBullet(Vector bulletPoint)

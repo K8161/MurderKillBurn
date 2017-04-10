@@ -25,25 +25,13 @@ namespace harjoitustyo
         public Vector vector { get; set; }
         public Point point { get; set; }
 
-        public int characterWidth { get; set; }
+        public int characterWidth = 30;
         private DispatcherTimer timer;
         public string Name { get; set; }
         public int Score { get; set; }
         public int Hitpoints { get; set; }
         public bool HasWeapon { get; set; }
         public bool UsesAmmo { get; set; }
-
-        private void PaintSnake(Point currentpoint)
-        {
-            Ellipse character = new Ellipse();
-            ImageBrush player = new ImageBrush();
-            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
-            character.Fill = player;
-            character.Width = characterWidth;
-            character.Height = characterWidth;
-            //Canvas.SetTop(snake, currentpoint.Y);
-            //Canvas.SetLeft(snake, currentpoint.X);
-        }
 
         /*public void Move(object sender, KeyEventArgs e)
         {
@@ -116,12 +104,21 @@ namespace harjoitustyo
         public int Ammo { get; set; }
         public int Score { get; set; }
 
-     /*   public Player (string name)
-          {
-              Name = name;
-          } */
+        public Ellipse character = new Ellipse();
 
-        public Player player = new Player();
+        /*   public Player (string name)
+             {
+                 Name = name;
+             } */
+
+        public void PaintPlayer()
+        {
+            ImageBrush player = new ImageBrush();
+            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
+            character.Fill = player;
+            character.Width = characterWidth;
+            character.Height = characterWidth;
+        }
 
         public void GainScore()
         {
