@@ -88,9 +88,11 @@ namespace harjoitustyo
     public class Enemy : Character
     {
         public int ScoreValue { get; set; }
-        public int Accuracy { get; set; }
+        private int minScoreValue = 50;
+        private int maxScoreValue = 250;
+        public int Damage { get; set; }
 
-        public Ellipse enemy = new Ellipse();
+        public Vector EnemyPosition = new Vector();
 
         public Ellipse monster = new Ellipse();
         Random rnd = new Random();
@@ -99,11 +101,12 @@ namespace harjoitustyo
 
         public void PaintMonster()
         {
-            ImageBrush player = new ImageBrush();
-            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            monster.Fill = player;
+            ImageBrush enemy = new ImageBrush();
+            enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+            monster.Fill = enemy;
             monster.Width = characterWidth;
             monster.Height = characterWidth;
+            ScoreValue = rnd.Next(minScoreValue, maxScoreValue);
         }
 
         public void CreateEnemy()
@@ -121,9 +124,9 @@ namespace harjoitustyo
             //Ellipse enemy = new Ellipse();
             ImageBrush enemyImg = new ImageBrush();
             enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            enemy.Fill = enemyImg;
-            enemy.Width = 30;
-            enemy.Height = 30;
+            //monster.Fill = enemyImg;
+           // monster.Width = 30;
+           // monster.Height = 30;
 
             /* Canvas.SetTop(enemy, enemyPoint.Y);
             Canvas.SetLeft(enemy, enemyPoint.X);

@@ -31,13 +31,17 @@ public partial class MainWindow : Window
         public const int maxWidth = 1560;
         private const int characterWidth = 30;
         private const int bulletWidth = 15;
+        private int enemyCounter = 0;
         private int difficulty = 5; //timerin ajastin aika ms
+        private int minDamage = 5;
+        private int maxDamage = 25;
         private List<Point> rocks = new List<Point>(); //kivikokoelma
         private List<Point> enemies = new List<Point>(); //viholliskokoelma
         private List<Vector> bullets = new List<Vector>();
+        private List<Vector> monsterVectors = new List<Vector>(); //lista liikkuvien vihollisten sijainteja varten
         List<Enemy> Enemies = new List<Enemy>();
         private const int obstacleCount = 15;
-        private const int enemyCount = 12;
+        private const int enemyCount = 20; // vihollisten maara
         private Vector bulletPosition = new Vector();
         private Random rnd = new Random(); //pisteiden arvontaa varten
         private DispatcherTimer timer;
@@ -45,13 +49,13 @@ public partial class MainWindow : Window
         Ellipse bullet = new Ellipse();
         RotateTransform rotate = new RotateTransform();
         RotateTransform rotateAngle = new RotateTransform();
-        Point testi = new Point();
         Vector charMove_norm;
         Vector bulletMove_norm;
         private Vector enemySpawn = new Vector(600, 600);
-        Vector movingMonsterPoint;
         Vector EnemyMove_norm;
         int MagazineSize = 10;
+        Enemy[] monsters = new Enemy[enemyCount];
+
         Ellipse rock;
 
         Player playerone = new Player();
@@ -90,11 +94,11 @@ public partial class MainWindow : Window
 
                 //piirretään kivet, pelaaja ja viholliset
                 IniRocks();
-                IniEnemies();
                 PaintPlayerOne(playerone.startingPoint);
                 playerone.currentPosition = playerone.startingPoint;
+                playerone.Hitpoints = 100;
                 paintCanvas.Children.Add(playerone.character);
-                paintCanvas.Children.Add(movingMonster.monster);
+                IniEnemies();
 
                 //start game
                 timer.Start();
@@ -121,25 +125,27 @@ public partial class MainWindow : Window
             }
         }
 
-        private void IniEnemies()
+
+        public void IniEnemies()
         {
-            for (int n = 0; n < enemyCount; n++)
+
+            for (int i = 0; i < enemyCount - 1; i++) // luodaan vihollisia ennaltamääritelty määrä
             {
-                PaintEnemy(n);
+                monsters[i] = new Enemy();
+                
             }
+
+            for (int i = 0; i < enemyCount - 1; i++)
+            {
+                monsters[i].PaintMonster();
+                monsters[i].Damage = rnd.Next(minDamage, maxDamage);
+                monsters[i].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth),
+                                       rnd.Next(minimi, maxHeight));
+                paintCanvas.Children.Add(monsters[i].monster);
+            }
+            PaintMovingMonsters(new Vector(rnd.Next(minimi, maxWidth),
+                                       rnd.Next(minimi, maxHeight)));
         } 
-
-      /*  public void IniEnemies()
-        {
-
-            for (int j = 0; j < 12; j++)
-            {
-                Enemy zombie = new Enemy();
-                zombie.PaintEnemy();
-                Enemies.Add(zombie);
-                PaintEnemy(j);
-            }
-        } */
 
         public void charMove(object sender, MouseEventArgs e)
         {
@@ -180,13 +186,9 @@ public partial class MainWindow : Window
                                 txbMag.Text = " Ammo left: Reloading...";
                                 MagazineSize = 10;
                             }
-                            //paintCanvas.Children.Add(bullet);
-
                             Vector bulletMove = targetVec - bulletVec;
                             double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
                             bulletMove_norm = bulletMove / bulletMove_length;
-
-                            bulletTimer.Start();
                             break;
                     }
                 }
@@ -232,7 +234,6 @@ public partial class MainWindow : Window
                ImageBrush rockImg = new ImageBrush();
                rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
                rock.Fill = rockImg; 
-            //stone.PaintRocks();
             Canvas.SetTop(rock, point.Y);
             Canvas.SetLeft(rock, point.X);
             paintCanvas.Children.Insert(index, rock);
@@ -257,8 +258,6 @@ public partial class MainWindow : Window
                 bullet.Height = bulletWidth;
                 Canvas.SetTop(bullet, bulletPoint.Y);
                 Canvas.SetLeft(bullet, bulletPoint.X);
-                //paintCanvas.Children.Insert(index, bullet);
-                //bullets.Insert(index, bulletPosition);
             }
             catch (Exception ex)
             {
@@ -266,41 +265,70 @@ public partial class MainWindow : Window
                 MessageBox.Show(ex.Message);
             }
         }
-
-     /*   private void SpawnEnemies()
+        private void MonsterPositionLogic()
         {
-            for (int j=0; j<=enemyCount;j++)
+            Vector Curplay = playerone.currentPosition;
+            Vector CurEnem = new Vector(monsters[enemyCounter].EnemyPosition.X, monsters[enemyCounter].EnemyPosition.Y);
+            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
+
+            Vector EnemyMove = CurEnem - CurPlay;
+            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
+            EnemyMove_norm = EnemyMove / EnemyMove_length;
+            monsters[enemyCounter].EnemyPosition = monsters[enemyCounter].EnemyPosition - EnemyMove_norm * 0.7;
+        }
+
+        private void MonsterCollisionDetection()
+        {
+            if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - playerone.currentPosition.X) < 10) &&
+                      (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 10))
             {
-                Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
-                                   rnd.Next(minimi, maxHeight));
-                ene
+                if (playerone.Hitpoints - monsters[enemyCounter].Damage > 0)
+                {
+                    playerone.Hitpoints -= monsters[enemyCounter].Damage;
+                    Recoil();
+                }
+                else
+                {
+                    GameOver();
+                }
             }
-        } */
 
-        private void PaintEnemy(int index)
-        {
-            Point enemyPoint = new Point(rnd.Next(minimi, maxWidth),
-                                    rnd.Next(minimi, maxHeight));
-
-            Ellipse enemy = new Ellipse();
-            ImageBrush enemyImg = new ImageBrush();
-            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            enemy.Fill = enemyImg;
-            enemy.Width = 30;
-            enemy.Height = 30;
-
-            Canvas.SetTop(enemy, enemyPoint.Y);
-            Canvas.SetLeft(enemy, enemyPoint.X);
-            paintCanvas.Children.Insert(index, enemy);
-            enemies.Insert(index, enemyPoint);
+            if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bulletPosition.X) < 30) &&
+                (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bulletPosition.Y) < 30))
+            {
+                KillMonster();
+            }
         }
 
-        private void PaintMovingMonster(Vector enemyPoint1)
+        private void Recoil()
         {
-            movingMonster.PaintMonster();
-            Canvas.SetTop(movingMonster.monster, movingMonsterPoint.Y);
-            Canvas.SetLeft(movingMonster.monster, movingMonsterPoint.X);
+            if (playerone.currentPosition.X - monsters[enemyCounter].EnemyPosition.X > 5)
+            {
+                playerone.currentPosition.X += 10;
+            }
+
+            if (playerone.currentPosition.X - monsters[enemyCounter].EnemyPosition.X < 5)
+            {
+                playerone.currentPosition.X -= 10;
+            }
+            if (playerone.currentPosition.Y - monsters[enemyCounter].EnemyPosition.X > 5)
+            {
+                playerone.currentPosition.Y += 10;
+            }
+
+            if (playerone.currentPosition.Y - monsters[enemyCounter].EnemyPosition.X < 5)
+            {
+                playerone.currentPosition.Y -= 10;
+            }
         }
+
+        private void PaintMovingMonsters(Vector enemyPoint1)
+        {
+                monsters[enemyCounter].PaintMonster();
+                Canvas.SetTop(monsters[enemyCounter].monster, monsters[enemyCounter].EnemyPosition.Y);
+                Canvas.SetLeft(monsters[enemyCounter].monster, monsters[enemyCounter].EnemyPosition.X);
+            
+        } 
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
@@ -319,48 +347,27 @@ public partial class MainWindow : Window
                     else
                         this.Close();
                     break;
-                    /*case Key.Left:
-                        if (currentPosition.X > minimi)
-                        currentPosition.X -= characterWidth / 8;
-                        break;*/
                     case Key.Up:
                         if (playerone.currentPosition.Y > minimi)
                         playerone.currentPosition = playerone.currentPosition + charMove_norm * difficulty;
                         break;
-                    /*case Key.Right:
-                        if (currentPosition.X < maxWidth)
-                        currentPosition.X += characterWidth / 8;
-                        break;*/
                     case Key.Down:
                         if (playerone.currentPosition.Y < maxHeight)
                         playerone.currentPosition = playerone.currentPosition - charMove_norm * difficulty;
                     break;
             }
-            // lastDirection = currentDirection;
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
             PaintPlayerOne(playerone.currentPosition);
-
-            Vector Curplay = playerone.currentPosition;
-            Vector CurEnem = new Vector(movingMonsterPoint.X, movingMonsterPoint.Y);
-            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
-
-            Vector EnemyMove = CurEnem - CurPlay;
-            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
-            EnemyMove_norm = EnemyMove / EnemyMove_length;
-            movingMonsterPoint = movingMonsterPoint - EnemyMove_norm * 0.7;
-            
-            PaintMovingMonster(movingMonsterPoint);
-
-            if ((Math.Abs(movingMonsterPoint.X - playerone.currentPosition.X) < 10) &&
-                (Math.Abs(movingMonsterPoint.Y - playerone.currentPosition.Y) < 10))
+            for (enemyCounter = 0; enemyCounter < enemyCount - 1; enemyCounter++)
             {
-                GameOver();
+                MonsterPositionLogic();
+                PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
+                MonsterCollisionDetection();
             }
 
-            
         }
 
         private void bulletTimer_Tick(object sender, EventArgs e)
@@ -375,24 +382,6 @@ public partial class MainWindow : Window
                 bulletTimer.Stop();
                 paintCanvas.Children.Remove(bullet);
             }
-            int n = 0;
-            foreach (Point point in enemies)
-            {
-                if ((Math.Abs(point.X - bulletPosition.X) < 30) &&
-                    (Math.Abs(point.Y - bulletPosition.Y) < 30))
-                {
-                    enemies.RemoveAt(n);
-                    paintCanvas.Children.RemoveAt(n);
-                    paintCanvas.Children.Remove(bullet);
-                    bulletTimer.Stop();
-                    PaintEnemy(n);
-                    playerone.Score += 100;
-                    txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
-                    break;
-                }
-                n++;
-            } 
-
             try
             {
                 foreach (Point point in rocks)
@@ -409,22 +398,16 @@ public partial class MainWindow : Window
             {
                 MessageBox.Show(ex.Message);
             }
-
-            if ((Math.Abs(movingMonsterPoint.X - bulletPosition.X) < 30) &&
-                (Math.Abs(movingMonsterPoint.Y - bulletPosition.Y) < 30))
-            {
-                KillMonster();
-            }
         }
 
         private void KillMonster()
         {
-            playerone.Score += movingMonster.ScoreValue;
+            playerone.Score += monsters[enemyCounter].ScoreValue;
             paintCanvas.Children.Remove(bullet);
             txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
             bulletTimer.Stop();
-            movingMonsterPoint = new Vector(rnd.Next(minimi, maxWidth),
-                                rnd.Next(minimi, maxHeight));
+            monsters[enemyCounter].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth),
+                                                              rnd.Next(minimi, maxHeight));
         }
 
         private void GameOver()
@@ -437,9 +420,6 @@ public partial class MainWindow : Window
 
         private void GameOverShow()
         {
-            //txtMessage.Text = "Your score: " + score + "\npress Esc to quit";
-            //paintCanvas.Children.Add(txtMessage);
-            //animaatio joka siirtää kanvaasin
             var trs = new TranslateTransform();
             var anim = new DoubleAnimation(0, 620, TimeSpan.FromSeconds(15));
             trs.BeginAnimation(TranslateTransform.XProperty, anim);
@@ -457,8 +437,6 @@ public partial class MainWindow : Window
                 {
                     playerone.Name = txtName.Text;
                     SaveScore();
-                    //txtMessage.Text = "Your score: " + score + "\npress Esc to quit";
-                    //paintCanvas.Children.Add(txtMessage);
                     GameOverShow();
                 }
                 catch (Exception ex)
