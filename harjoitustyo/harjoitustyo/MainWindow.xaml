@@ -20,6 +20,7 @@
             
             <TextBlock x:Name="txbMag" Canvas.Left="1250" TextWrapping="Wrap" FontSize="30" Text="Ammo left:  " Canvas.Top="20"/>
             <TextBlock x:Name="txbScore" Canvas.Left="20" TextWrapping="Wrap" FontSize="30" Text="Score:  " Canvas.Top="20"/>
+            <ProgressBar x:Name="pgbHealth" Canvas.Left="650" Canvas.Top="20" Height="30" Width="200" Value="{Binding Hitpoints}"/>
 
         </Canvas>
     </Grid>

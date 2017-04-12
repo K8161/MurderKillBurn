@@ -96,6 +96,7 @@ public partial class MainWindow : Window
                 playerone.Ammo = 10;
                 paintCanvas.Children.Add(playerone.character);
                 IniEnemies();
+                pgbHealth.DataContext = playerone;
 
                 //start game
                 timer.Start();

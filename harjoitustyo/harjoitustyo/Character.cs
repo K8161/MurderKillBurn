@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,12 +15,27 @@ using System.Windows.Threading;
 
 namespace harjoitustyo
 {
-    public class Character
+    public class Character : INotifyPropertyChanged
     {
 
         public int characterWidth = 30;
         public string Name { get; set; }
-        public int Hitpoints { get; set; }
+        private int hitpoints;
+        public int Hitpoints
+        {
+            get
+            {
+                // return employees firstname
+                return hitpoints;
+            }
+            set
+            {
+                // set a new value for firstname
+                hitpoints = value;
+                // raise firtstname property changed method
+                RaisePropertyChanged();
+            }
+        }
 
         public Random rnd = new Random();
 
@@ -28,6 +45,16 @@ namespace harjoitustyo
         public Vector currentPosition = new Vector();
         public Vector charMove_norm;
         RotateTransform rotate = new RotateTransform();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public void Move(Point targ)
         {
