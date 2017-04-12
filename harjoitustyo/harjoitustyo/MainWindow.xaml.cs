@@ -36,7 +36,8 @@ public partial class MainWindow : Window
         private int maxDamage = 25;
         private List<Point> rocks = new List<Point>(); //kivikokoelma
         private List<Point> enemies = new List<Point>(); //viholliskokoelma
-        private List<Vector> bullets = new List<Vector>();
+        private List<Weapon> bullets = new List<Weapon>();
+        private int bulletcount = 0;
         private List<Vector> monsterVectors = new List<Vector>(); //lista liikkuvien vihollisten sijainteja varten
         List<Enemy> Enemies = new List<Enemy>();
         private const int obstacleCount = 15;
@@ -190,6 +191,15 @@ public partial class MainWindow : Window
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        private void Shoot1(object sender, MouseButtonEventArgs e)
+        {
+            Weapon bullet1 = new Weapon();
+            bullets.Add(bullet1);
+            bullet1.PaintBullet();
+
+
         }
 
         private void Rotate(object sender, MouseEventArgs e)
