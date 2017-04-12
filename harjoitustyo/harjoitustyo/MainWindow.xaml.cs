@@ -47,9 +47,8 @@ public partial class MainWindow : Window
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
         Ellipse bullet = new Ellipse();
-        RotateTransform rotate = new RotateTransform();
-        RotateTransform rotateAngle = new RotateTransform();
-        Vector charMove_norm;
+        
+
         Vector bulletMove_norm;
         private Vector enemySpawn = new Vector(600, 600);
         Vector EnemyMove_norm;
@@ -150,12 +149,7 @@ public partial class MainWindow : Window
         public void charMove(object sender, MouseEventArgs e)
         {
             Point targ = e.GetPosition(paintCanvas);
-            Vector tarVec = new Vector(targ.X, targ.Y);
-            Vector curVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y);
-
-            Vector charMove = tarVec - curVec;
-            double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
-            charMove_norm = charMove / charMove_length;
+            playerone.Move(targ);
         }
 
         private void Shoot(object sender, MouseButtonEventArgs e)
@@ -204,17 +198,8 @@ public partial class MainWindow : Window
             try
             {
                 Point targetPoint = e.GetPosition(this);
+                playerone.Rotation(targetPoint);
 
-                Point charSize = new Point(playerone.character.ActualWidth / 50, playerone.character.ActualHeight / 50);
-
-                playerone.character.RenderTransformOrigin = charSize;
-                playerone.character.RenderTransform = rotate;
-
-                double y = Canvas.GetTop(playerone.character) + playerone.character.ActualWidth / 2.0;
-                double x = Canvas.GetLeft(playerone.character) + playerone.character.ActualHeight / 2.0;
-                Point originPoint = new Point(x, y);
-
-                rotate.Angle = playerone.Angle(originPoint, targetPoint);
             }
             catch (Exception ex)
             {
@@ -349,11 +334,11 @@ public partial class MainWindow : Window
                     break;
                     case Key.Up:
                         if (playerone.currentPosition.Y > minimi)
-                        playerone.currentPosition = playerone.currentPosition + charMove_norm * difficulty;
+                        playerone.currentPosition = playerone.currentPosition + playerone.charMove_norm * difficulty;
                         break;
                     case Key.Down:
                         if (playerone.currentPosition.Y < maxHeight)
-                        playerone.currentPosition = playerone.currentPosition - charMove_norm * difficulty;
+                        playerone.currentPosition = playerone.currentPosition - playerone.charMove_norm * difficulty;
                     break;
             }
         }

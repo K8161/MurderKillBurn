@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,65 +13,71 @@ using System.Windows.Threading;
 
 namespace harjoitustyo
 {
-    public enum Direction
-    {
-        Up,
-        Right,
-        Down,
-        Left
-    }
-
     public class Character
     {
-        public Vector vector { get; set; }
-        public Point point { get; set; }
 
         public int characterWidth = 30;
         public string Name { get; set; }
         public int Hitpoints { get; set; }
-        public bool HasWeapon { get; set; }
-        public bool UsesAmmo { get; set; }
 
-        /*public void Move(object sender, KeyEventArgs e)
+        public Random rnd = new Random();
+
+        public Ellipse character = new Ellipse();
+
+        public Vector startingPoint = new Vector(200, 100);
+        public Vector currentPosition = new Vector();
+        public Vector charMove_norm;
+        RotateTransform rotate = new RotateTransform();
+
+        public void Move(Point targ)
         {
-            //muutetaan suuntaa näppäimistön painalluksen mukaan
-            switch (e.Key)
+            Vector tarVec = new Vector(targ.X, targ.Y);
+            Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
+
+            Vector charMove = tarVec - curVec;
+            double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
+            charMove_norm = charMove / charMove_length;
+        }
+
+        public double Angle(Point origin, Point target)
+        {
+            Vector vector = new Vector();
+            vector.X = target.X - origin.X;
+            vector.Y = target.Y - origin.Y;
+            vector.Normalize();
+            double dotAngle = -vector.Y;
+            double angle = Math.Acos(dotAngle);
+            angle = angle * 180 / Math.PI;
+            if (vector.X > 0)
             {
-                case Key.P:
-                    if (timer.IsEnabled)
-                        timer.Stop();
-                    else
-                        timer.Start();
-                    break;
-                case Key.Escape:
-                    if (timer.IsEnabled)
-                        Engine.GameOver();
-                    else
-                        this.Close();
-                    break;
-                case Key.Left:
-                        if (currentPosition.X > minimi)
-                        currentPosition.X -= characterWidth / 8;
-                        break;
-                case Key.Up:
-                        if (currentPosition.Y > minimi)
-                        currentPosition.Y -= characterWidth / 8;
-                        break;
-                case Key.Right:
-                        if (currentPosition.X < maxWidth)
-                        currentPosition.X += characterWidth / 8;
-                        break;
-                case Key.Down:
-                        if (currentPosition.Y < maxHeight)
-                        currentPosition.Y += characterWidth / 8;
-                        break;
+                return angle;
             }
-            // lastDirection = currentDirection;
-        }*/
+            else
+            {
+                return -angle;
+            }
+        }
 
-        public void Fight()
+        public void Rotation(Point targetPoint)
         {
+            try
+            {
 
+                Point charSize = new Point(character.ActualWidth / 50, character.ActualHeight / 50);
+
+                character.RenderTransformOrigin = charSize;
+                character.RenderTransform = rotate;
+
+                double y = Canvas.GetTop(character) + character.ActualWidth / 2.0;
+                double x = Canvas.GetLeft(character) + character.ActualHeight / 2.0;
+                Point originPoint = new Point(x, y);
+
+                rotate.Angle = Angle(originPoint, targetPoint);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void Die()
@@ -95,7 +102,7 @@ namespace harjoitustyo
         public Vector EnemyPosition = new Vector();
 
         public Ellipse monster = new Ellipse();
-        Random rnd = new Random();
+        
 
         //List<Object> Enemies = new List<object>();
 
@@ -142,11 +149,6 @@ namespace harjoitustyo
         public int Ammo { get; set; }
         public int Score { get; set; }
 
-        public Ellipse character = new Ellipse();
-
-        public Vector startingPoint = new Vector(200, 100);
-        public Vector currentPosition = new Vector();
-
         public void PaintPlayer()
         {
             ImageBrush player = new ImageBrush();
@@ -156,24 +158,7 @@ namespace harjoitustyo
             character.Height = characterWidth;
         }
 
-        public double Angle(Point origin, Point target)
-        {
-            Vector vector = new Vector();
-            vector.X = target.X - origin.X;
-            vector.Y = target.Y - origin.Y;
-            vector.Normalize();
-            double dotAngle = -vector.Y;
-            double angle = Math.Acos(dotAngle);
-            angle = angle * 180 / Math.PI;
-            if (vector.X > 0)
-            {
-                return angle;
-            }
-            else
-            {
-                return -angle;
-            }
-        }
+        
         public void ExitWhenDead()
         {
 
