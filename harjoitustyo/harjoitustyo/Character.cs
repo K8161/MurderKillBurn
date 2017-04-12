@@ -98,47 +98,32 @@ namespace harjoitustyo
         private int minScoreValue = 50;
         private int maxScoreValue = 250;
         public int Damage { get; set; }
+        public const int enemyCount = 20;
+        public Vector EnemyMove_norm;
 
         public Vector EnemyPosition = new Vector();
-
-        public Ellipse monster = new Ellipse();
         
-
-        //List<Object> Enemies = new List<object>();
 
         public void PaintMonster()
         {
             ImageBrush enemy = new ImageBrush();
             enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            monster.Fill = enemy;
-            monster.Width = characterWidth;
-            monster.Height = characterWidth;
+            character.Fill = enemy;
+            character.Width = characterWidth;
+            character.Height = characterWidth;
             ScoreValue = rnd.Next(minScoreValue, maxScoreValue);
         }
 
-        public void CreateEnemy()
+        public void MonsterPositionLogic(Vector currentPosition)
         {
-        //Enemy zombie = new Enemy();
-        //zombie.PaintEnemy();
-        //Enemies.Add(zombie);
-        }
+            Vector Curplay = currentPosition;
+            Vector CurEnem = new Vector(EnemyPosition.X, EnemyPosition.Y);
+            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
 
-        public void PaintEnemy()
-        {
-            //Enemy zombie = new Enemy();
-            //enemyPoint = new Point(rnd.Next(MainWindow.minimi, MainWindow.maxWidth),
-                                    //rnd.Next(MainWindow.minimi, MainWindow.maxHeight));
-            //Ellipse enemy = new Ellipse();
-            ImageBrush enemyImg = new ImageBrush();
-            enemyImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            //monster.Fill = enemyImg;
-           // monster.Width = 30;
-           // monster.Height = 30;
-
-            /* Canvas.SetTop(enemy, enemyPoint.Y);
-            Canvas.SetLeft(enemy, enemyPoint.X);
-            paintCanvas.Children.Insert(index, enemy);
-            enemies.Insert(index, enemyPoint); */
+            Vector EnemyMove = CurEnem - CurPlay;
+            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
+            EnemyMove_norm = EnemyMove / EnemyMove_length;
+            EnemyPosition = EnemyPosition - EnemyMove_norm * 0.7;
         }
 
     }

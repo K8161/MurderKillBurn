@@ -29,7 +29,6 @@ public partial class MainWindow : Window
         public const int minimi = 5;
         public const int maxHeight = 860;
         public const int maxWidth = 1560;
-        private const int characterWidth = 30;
         private const int bulletWidth = 15;
         private int enemyCounter = 0;
         private int difficulty = 5; //timerin ajastin aika ms
@@ -51,8 +50,6 @@ public partial class MainWindow : Window
 
         Vector bulletMove_norm;
         private Vector enemySpawn = new Vector(600, 600);
-        Vector EnemyMove_norm;
-        int MagazineSize = 10;
         Enemy[] monsters = new Enemy[enemyCount];
 
         Ellipse rock;
@@ -96,6 +93,7 @@ public partial class MainWindow : Window
                 PaintPlayerOne(playerone.startingPoint);
                 playerone.currentPosition = playerone.startingPoint;
                 playerone.Hitpoints = 100;
+                playerone.Ammo = 10;
                 paintCanvas.Children.Add(playerone.character);
                 IniEnemies();
 
@@ -140,7 +138,7 @@ public partial class MainWindow : Window
                 monsters[i].Damage = rnd.Next(minDamage, maxDamage);
                 monsters[i].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth),
                                        rnd.Next(minimi, maxHeight));
-                paintCanvas.Children.Add(monsters[i].monster);
+                paintCanvas.Children.Add(monsters[i].character);
             }
             PaintMovingMonsters(new Vector(rnd.Next(minimi, maxWidth),
                                        rnd.Next(minimi, maxHeight)));
@@ -167,18 +165,18 @@ public partial class MainWindow : Window
                             Vector targetVec = new Vector(target.X, target.Y);
                             Vector bulletVec = new Vector(playerone.currentPosition.X, playerone.currentPosition.Y); ;
 
-                            if (MagazineSize > 0)
+                            if (playerone.Ammo > 0)
                             {
                                 paintCanvas.Children.Add(bullet);
                                 bulletTimer.Start();
-                                MagazineSize--;
-                                txbMag.Text = "Ammo left: " + Convert.ToString(MagazineSize);
+                                playerone.Ammo--;
+                                txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
                             }
 
                             else
                             {
                                 txbMag.Text = " Ammo left: Reloading...";
-                                MagazineSize = 10;
+                                playerone.Ammo = 10;
                             }
                             Vector bulletMove = targetVec - bulletVec;
                             double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
@@ -250,16 +248,9 @@ public partial class MainWindow : Window
                 MessageBox.Show(ex.Message);
             }
         }
-        private void MonsterPositionLogic()
+        private void MonsterFollow()
         {
-            Vector Curplay = playerone.currentPosition;
-            Vector CurEnem = new Vector(monsters[enemyCounter].EnemyPosition.X, monsters[enemyCounter].EnemyPosition.Y);
-            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
-
-            Vector EnemyMove = CurEnem - CurPlay;
-            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
-            EnemyMove_norm = EnemyMove / EnemyMove_length;
-            monsters[enemyCounter].EnemyPosition = monsters[enemyCounter].EnemyPosition - EnemyMove_norm * 0.7;
+            monsters[enemyCounter].MonsterPositionLogic(playerone.currentPosition);
         }
 
         private void MonsterCollisionDetection()
@@ -278,8 +269,8 @@ public partial class MainWindow : Window
                 }
             }
 
-            if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bulletPosition.X) < 30) &&
-                (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bulletPosition.Y) < 30))
+            if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bulletPosition.X) < playerone.characterWidth) &&
+                (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bulletPosition.Y) < playerone.characterWidth))
             {
                 KillMonster();
             }
@@ -310,8 +301,8 @@ public partial class MainWindow : Window
         private void PaintMovingMonsters(Vector enemyPoint1)
         {
                 monsters[enemyCounter].PaintMonster();
-                Canvas.SetTop(monsters[enemyCounter].monster, monsters[enemyCounter].EnemyPosition.Y);
-                Canvas.SetLeft(monsters[enemyCounter].monster, monsters[enemyCounter].EnemyPosition.X);
+                Canvas.SetTop(monsters[enemyCounter].character, monsters[enemyCounter].EnemyPosition.Y);
+                Canvas.SetLeft(monsters[enemyCounter].character, monsters[enemyCounter].EnemyPosition.X);
             
         } 
 
@@ -348,7 +339,7 @@ public partial class MainWindow : Window
             PaintPlayerOne(playerone.currentPosition);
             for (enemyCounter = 0; enemyCounter < enemyCount - 1; enemyCounter++)
             {
-                MonsterPositionLogic();
+                MonsterFollow();
                 PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
                 MonsterCollisionDetection();
             }
