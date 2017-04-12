@@ -20,7 +20,7 @@ namespace harjoitustyo
         Left
     }
 
-    class Character
+    public class Character
     {
         public Vector vector { get; set; }
         public Point point { get; set; }
@@ -85,7 +85,7 @@ namespace harjoitustyo
         
     }
 
-    class Enemy : Character
+    public class Enemy : Character
     {
         public int ScoreValue { get; set; }
         public int Accuracy { get; set; }

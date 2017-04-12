@@ -80,6 +80,7 @@ public partial class MainWindow : Window
 
                 bulletTimer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
                 bulletTimer.Tick += new EventHandler(bulletTimer_Tick);
+                movingMonster.ScoreValue = 200;
 
                 //määritellään ikkunalle tapahtumankäsittelijä näppäimistön kuuntelua varten
                 this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
@@ -87,7 +88,7 @@ public partial class MainWindow : Window
                 this.MouseMove += new MouseEventHandler(charMove);
                 this.MouseDown += new MouseButtonEventHandler(Shoot);
 
-                //piirretään esteet ja pelaaja
+                //piirretään kivet, pelaaja ja viholliset
                 IniRocks();
                 IniEnemies();
                 PaintPlayerOne(playerone.startingPoint);
@@ -359,6 +360,21 @@ public partial class MainWindow : Window
                 GameOver();
             }
 
+            
+        }
+
+        private void bulletTimer_Tick(object sender, EventArgs e)
+        {
+            if (bulletPosition.Y > minimi && bulletPosition.Y < maxHeight 
+                && bulletPosition.X > minimi && bulletPosition.X < maxWidth)
+            {
+                bulletPosition = bulletPosition + bulletMove_norm * difficulty;
+                PaintBullet(bulletPosition);
+            }
+            else {
+                bulletTimer.Stop();
+                paintCanvas.Children.Remove(bullet);
+            }
             int n = 0;
             foreach (Point point in enemies)
             {
@@ -375,7 +391,7 @@ public partial class MainWindow : Window
                     break;
                 }
                 n++;
-            }
+            } 
 
             try
             {
@@ -393,20 +409,22 @@ public partial class MainWindow : Window
             {
                 MessageBox.Show(ex.Message);
             }
+
+            if ((Math.Abs(movingMonsterPoint.X - bulletPosition.X) < 30) &&
+                (Math.Abs(movingMonsterPoint.Y - bulletPosition.Y) < 30))
+            {
+                KillMonster();
+            }
         }
 
-        private void bulletTimer_Tick(object sender, EventArgs e)
+        private void KillMonster()
         {
-            if (bulletPosition.Y > minimi && bulletPosition.Y < maxHeight 
-                && bulletPosition.X > minimi && bulletPosition.X < maxWidth)
-            {
-                bulletPosition = bulletPosition + bulletMove_norm * difficulty;
-                PaintBullet(bulletPosition);
-            }
-            else {
-                bulletTimer.Stop();
-                paintCanvas.Children.Remove(bullet);
-            }
+            playerone.Score += movingMonster.ScoreValue;
+            paintCanvas.Children.Remove(bullet);
+            txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
+            bulletTimer.Stop();
+            movingMonsterPoint = new Vector(rnd.Next(minimi, maxWidth),
+                                rnd.Next(minimi, maxHeight));
         }
 
         private void GameOver()
