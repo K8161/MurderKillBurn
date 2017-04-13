@@ -25,45 +25,53 @@ namespace harjoitustyo
 
 public partial class MainWindow : Window
     {
-        //variables and consts
-        public const int minimi = 5;
-        public const int maxHeight = 860;
-        public const int maxWidth = 1560;
-        private const int bulletWidth = 15;
+        //constants, variables, objects and lists/arrays
+        #region
+        //map boundaries
+        public const int minimi = 20;
+        public const int maxHeight = 880;
+        public const int maxWidth = 1580;
+
+        //enemies
+        private int minDamage = 5; //minimum attack damage from an enemy
+        private int maxDamage = 25; //maximum attack damage from an enemy
         private int enemyCounter = 0;
-        private int difficulty = 5; //timerin ajastin aika ms
-        private int minDamage = 5;
-        private int maxDamage = 25;
-        private List<Point> rocks = new List<Point>(); //kivikokoelma
         private List<Point> enemies = new List<Point>(); //viholliskokoelma
-        private List<Weapon> bullets = new List<Weapon>();
-        private int bulletcount = 0;
         private List<Vector> monsterVectors = new List<Vector>(); //lista liikkuvien vihollisten sijainteja varten
-        List<Enemy> Enemies = new List<Enemy>();
-        private const int obstacleCount = 15;
+        private Vector enemySpawn = new Vector(600, 600);
+        private List<Enemy> Enemies = new List<Enemy>();
         private const int enemyCount = 20; // vihollisten maara
-        private Vector bulletPosition = new Vector();
-        private Random rnd = new Random(); //pisteiden arvontaa varten
+        
+        //timers
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
+        private int difficulty = 5; //timerin ajastin aika ms
+
+        private const int bulletWidth = 10;
         Ellipse bullet = new Ellipse();
-        
-
         Vector bulletMove_norm;
-        private Vector enemySpawn = new Vector(600, 600);
-        Enemy[] monsters = new Enemy[enemyCount];
-
+        private List<Weapon> bullets = new List<Weapon>();
+        private int bulletcount = 0;
+        private Vector bulletPosition = new Vector();
+        
         Ellipse rock;
+        private List<Point> rocks = new List<Point>(); //kivikokoelma
+        private const int obstacleCount = 15;
 
+        //objects derived from classes
+        Enemy[] monsters = new Enemy[enemyCount];
         Player playerone = new Player();
         Enemy movingMonster = new Enemy();
         Obstacle stone = new Obstacle();
+
+        //randomizer
+        private Random rnd = new Random(); //pisteiden arvontaa varten
+        #endregion
 
         public MainWindow()
         {
             try
             {
-
                 InitializeComponent();
 
                 btnOK.Visibility = Visibility.Hidden;
@@ -104,7 +112,6 @@ public partial class MainWindow : Window
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }
@@ -124,30 +131,29 @@ public partial class MainWindow : Window
             }
         }
 
-
         public void IniEnemies()
         {
 
             for (int i = 0; i < enemyCount - 1; i++) // luodaan vihollisia ennaltamääritelty määrä
             {
-                monsters[i] = new Enemy();
-                
+                monsters[i] = new Enemy(); //inserts an instance of class Enemy, into an objectarray derived from Enemy
             }
 
             for (int i = 0; i < enemyCount - 1; i++)
             {
                 monsters[i].PaintMonster();
-                monsters[i].Damage = rnd.Next(minDamage, maxDamage);
+                monsters[i].Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
                 monsters[i].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth),
-                                       rnd.Next(minimi, maxHeight));
+                                                       rnd.Next(minimi, maxHeight));
                 paintCanvas.Children.Add(monsters[i].character);
             }
             PaintMovingMonsters(new Vector(rnd.Next(minimi, maxWidth),
-                                       rnd.Next(minimi, maxHeight)));
+                                           rnd.Next(minimi, maxHeight)));
         } 
 
         public void charMove(object sender, MouseEventArgs e)
         {
+            //gets the mousepointer coordinates from the window and relays them into a Point variable
             Point targ = e.GetPosition(paintCanvas);
             playerone.Move(targ);
         }
@@ -181,7 +187,7 @@ public partial class MainWindow : Window
                                 playerone.Ammo = 10;
                             }
                             Vector bulletMove = targetVec - bulletVec;
-                            double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 3;
+                            double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
                             bulletMove_norm = bulletMove / bulletMove_length;
                             break;
                     }
@@ -198,17 +204,15 @@ public partial class MainWindow : Window
             Weapon bullet1 = new Weapon();
             bullets.Add(bullet1);
             bullet1.PaintBullet();
-
-
         }
 
         private void Rotate(object sender, MouseEventArgs e)
         {
             try
             {
+                //gets the mousepointer coordinates from the window and relays them into a Point variable
                 Point targetPoint = e.GetPosition(this);
                 playerone.Rotation(targetPoint);
-
             }
             catch (Exception ex)
             {
@@ -218,7 +222,7 @@ public partial class MainWindow : Window
 
         private void PaintRocks(int index)
         {
-            //arvotaan kivelle piste eli X ja Y -koordinaatti
+            //randomizes coordinates for a rock
                Point point = new Point(rnd.Next(minimi, maxWidth),
                                        rnd.Next(minimi, maxHeight));
 
@@ -255,22 +259,22 @@ public partial class MainWindow : Window
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }
         private void MonsterFollow()
         {
-            monsters[enemyCounter].MonsterPositionLogic(playerone.currentPosition);
+            monsters[enemyCounter].MonsterPositionLogic(playerone.currentPosition); //sets enemies to home on to player's current position
         }
 
         private void MonsterCollisionDetection()
         {
             if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - playerone.currentPosition.X) < 10) &&
-                      (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 10))
+                (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 10))
             {
                 if (playerone.Hitpoints - monsters[enemyCounter].Damage > 0)
                 {
+                    //if enemy does damage to player with more than zero hitpoints left, decrease hitpoints accordingly to dealt damage
                     playerone.Hitpoints -= monsters[enemyCounter].Damage;
                     Recoil();
                 }
@@ -283,12 +287,14 @@ public partial class MainWindow : Window
             if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bulletPosition.X) < playerone.characterWidth) &&
                 (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bulletPosition.Y) < playerone.characterWidth))
             {
+                //if bullet proximity to enemy less than characterWidth, kill enemy
                 KillMonster();
             }
         }
 
         private void Recoil()
         {
+            //player is bounced opposite from the direction of the attack
             if (playerone.currentPosition.X - monsters[enemyCounter].EnemyPosition.X > 5)
             {
                 playerone.currentPosition.X += 10;
@@ -314,30 +320,32 @@ public partial class MainWindow : Window
                 monsters[enemyCounter].PaintMonster();
                 Canvas.SetTop(monsters[enemyCounter].character, monsters[enemyCounter].EnemyPosition.Y);
                 Canvas.SetLeft(monsters[enemyCounter].character, monsters[enemyCounter].EnemyPosition.X);
-            
         } 
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
-            //muutetaan suuntaa näppäimistön painalluksen mukaan
+            //keyboard controls
             switch (e.Key)
             {
                 case Key.P:
                     if (timer.IsEnabled)
-                        timer.Stop();
+                        timer.Stop(); //pause game
                     else
-                        timer.Start();
+                        timer.Start(); //resume game if previously paused
                     break;
+
                 case Key.Escape:
                     if (timer.IsEnabled)
-                        GameOver();
+                        GameOver(); //forfeit game
                     else
                         this.Close();
                     break;
+
                     case Key.Up:
                         if (playerone.currentPosition.Y > minimi)
                         playerone.currentPosition = playerone.currentPosition + playerone.charMove_norm * difficulty;
                         break;
+
                     case Key.Down:
                         if (playerone.currentPosition.Y < maxHeight)
                         playerone.currentPosition = playerone.currentPosition - playerone.charMove_norm * difficulty;
@@ -354,7 +362,6 @@ public partial class MainWindow : Window
                 PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
                 MonsterCollisionDetection();
             }
-
         }
 
         private void bulletTimer_Tick(object sender, EventArgs e)
@@ -365,7 +372,8 @@ public partial class MainWindow : Window
                 bulletPosition = bulletPosition + bulletMove_norm * difficulty;
                 PaintBullet(bulletPosition);
             }
-            else {
+            else
+            {
                 bulletTimer.Stop();
                 paintCanvas.Children.Remove(bullet);
             }
@@ -389,11 +397,11 @@ public partial class MainWindow : Window
 
         private void KillMonster()
         {
-            playerone.Score += monsters[enemyCounter].ScoreValue;
+            playerone.Score += monsters[enemyCounter].ScoreValue; //add scorevalue to score when an enemy is dispatched from the monsters array
             paintCanvas.Children.Remove(bullet);
             txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
             bulletTimer.Stop();
-            monsters[enemyCounter].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth),
+            monsters[enemyCounter].EnemyPosition = new Vector(rnd.Next(minimi, maxWidth), //spawn new enemies and randomize their spawnpoints
                                                               rnd.Next(minimi, maxHeight));
         }
 
@@ -408,7 +416,7 @@ public partial class MainWindow : Window
         private void GameOverShow()
         {
             var trs = new TranslateTransform();
-            var anim = new DoubleAnimation(0, 620, TimeSpan.FromSeconds(15));
+            var anim = new DoubleAnimation(0, 620, TimeSpan.FromSeconds(10));
             trs.BeginAnimation(TranslateTransform.XProperty, anim);
             trs.BeginAnimation(TranslateTransform.YProperty, anim);
             paintCanvas.RenderTransform = trs;
@@ -428,7 +436,6 @@ public partial class MainWindow : Window
                 }
                 catch (Exception ex)
                 {
-
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -441,29 +448,27 @@ public partial class MainWindow : Window
             try
             {
                 string path = "Scoreboard.txt";
-                // Tutkitaan onko tiedosto olemassa, ja jollei ole niin luodaan tiedosto, ja siihen kolme riviä
+                //probes if the above mentioned file exists
                 if (!File.Exists(path))
                 {
-                    // Create a file to write to.
+                    //if not, create a new file to write to
                     using (StreamWriter sw = File.CreateText(path))
                     {
                         sw.WriteLine("Name  Score  Date");
                         sw.WriteLine(name + " " + finalscore + " " + DateTime.Now.ToString("dd-MM-yyyy"));
                     }
                 }
-
                 else
                 {
+                    //if yes, then write into it
                     using (StreamWriter sw = File.AppendText(path))
                     {
                         sw.WriteLine(name + "  " + finalscore + "  " + DateTime.Now.ToString("dd-MM-yyyy"));
                     }
                 }
             }
-
             catch (Exception ex)
             {
-                //("Some exception happened!");
                 MessageBox.Show(ex.Message);
             }
         }

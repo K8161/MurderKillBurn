@@ -18,8 +18,8 @@ namespace harjoitustyo
         public int ClipSize { get; set; }
         public Ellipse bullet = new Ellipse();
 
-        Vector targetVec;
-        Vector bulletVec;
+        public Vector targetVec = new Vector();
+        public Vector bulletVec = new Vector();
 
         public void Reload()
         {
