@@ -25,12 +25,19 @@ namespace harjoitustyo
 
         public void Fire(Point target, Vector currentPosition)
         {
-            targetVec = new Vector(target.X, target.Y);
-            bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
+            try
+            {
+                targetVec = new Vector(target.X, target.Y);
+                bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
 
-            Vector bulletMove = targetVec - bulletVec;
-            double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
-            bulletMove_norm = bulletMove / bulletMove_length;
+                Vector bulletMove = targetVec - bulletVec;
+                double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
+                bulletMove_norm = bulletMove / bulletMove_length;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void BulletVisual()

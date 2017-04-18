@@ -25,14 +25,12 @@ namespace harjoitustyo
         {
             get
             {
-                // return employees firstname
                 return hitpoints;
             }
             set
             {
-                // set a new value for firstname
                 hitpoints = value;
-                // raise firtstname property changed method
+                // raise hitpoints property changed method
                 RaisePropertyChanged();
             }
         }
@@ -44,7 +42,8 @@ namespace harjoitustyo
         public Vector startingPoint = new Vector(200, 100);
         public Vector currentPosition = new Vector();
         public Vector charMove_norm;
-        RotateTransform rotate = new RotateTransform();
+
+        public RotateTransform rotate = new RotateTransform();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -58,30 +57,45 @@ namespace harjoitustyo
 
         public void Move(Point targ)
         {
-            Vector tarVec = new Vector(targ.X, targ.Y);
-            Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
+            try
+            {
+                Vector tarVec = new Vector(targ.X, targ.Y);
+                Vector curVec = new Vector(currentPosition.X, currentPosition.Y);
 
-            Vector charMove = tarVec - curVec;
-            double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
-            charMove_norm = charMove / charMove_length;
+                Vector charMove = tarVec - curVec;
+                double charMove_length = Math.Sqrt(Math.Pow(charMove.X, 2) + Math.Pow(charMove.Y, 2));
+                charMove_norm = charMove / charMove_length;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public double Angle(Point origin, Point target)
         {
-            Vector vector = new Vector();
-            vector.X = target.X - origin.X;
-            vector.Y = target.Y - origin.Y;
-            vector.Normalize();
-            double dotAngle = -vector.Y;
-            double angle = Math.Acos(dotAngle);
-            angle = angle * 180 / Math.PI;
-            if (vector.X > 0)
+            try
             {
-                return angle;
+                Vector vector = new Vector();
+                vector.X = target.X - origin.X;
+                vector.Y = target.Y - origin.Y;
+                vector.Normalize();
+                double dotAngle = -vector.Y;
+                double angle = Math.Acos(dotAngle);
+                angle = angle * 180 / Math.PI;
+                if (vector.X > 0)
+                {
+                    return angle;
+                }
+                else
+                {
+                    return -angle;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return -angle;
+                MessageBox.Show(ex.Message);
+                return 0;
             }
         }
 
@@ -89,7 +103,6 @@ namespace harjoitustyo
         {
             try
             {
-
                 Point charSize = new Point(character.ActualWidth / 50, character.ActualHeight / 50);
 
                 character.RenderTransformOrigin = charSize;
@@ -106,17 +119,6 @@ namespace harjoitustyo
                 MessageBox.Show(ex.Message);
             }
         }
-
-        public void Die()
-        {
-
-        }
-
-        public void AlterHitPoints()
-        {
-
-        }
-        
     }
 
     public class Enemy : Character
@@ -126,54 +128,68 @@ namespace harjoitustyo
         private int maxScoreValue = 250;
         public int Damage { get; set; }
         public const int enemyCount = 20;
-        public Vector EnemyMove_norm;
 
-        public Vector EnemyPosition = new Vector();
+        public Vector EnemyMove_norm;
+        public Vector EnemyPosition;
         
 
         public void PaintMonster()
         {
-            ImageBrush enemy = new ImageBrush();
-            enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
-            character.Fill = enemy;
-            character.Width = characterWidth;
-            character.Height = characterWidth;
-            ScoreValue = rnd.Next(minScoreValue, maxScoreValue);
+            try
+            {
+                ImageBrush enemy = new ImageBrush();
+                enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+                character.Fill = enemy;
+                character.Width = characterWidth;
+                character.Height = characterWidth;
+                ScoreValue = rnd.Next(minScoreValue, maxScoreValue);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public void MonsterPositionLogic(Vector currentPosition)
         {
-            Vector Curplay = currentPosition;
-            Vector CurEnem = new Vector(EnemyPosition.X, EnemyPosition.Y);
-            Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
+            try
+            {
+                Vector Curplay = currentPosition;
+                Vector CurEnem = new Vector(EnemyPosition.X, EnemyPosition.Y);
+                Vector CurPlay = new Vector(Curplay.X, Curplay.Y);
 
-            Vector EnemyMove = CurEnem - CurPlay;
-            double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
-            EnemyMove_norm = EnemyMove / EnemyMove_length;
-            EnemyPosition = EnemyPosition - EnemyMove_norm * 0.7;
+                Vector EnemyMove = CurEnem - CurPlay;
+                double EnemyMove_length = Math.Sqrt(Math.Pow(EnemyMove.X, 2) + Math.Pow(EnemyMove.Y, 2));
+                EnemyMove_norm = EnemyMove / EnemyMove_length;
+                EnemyPosition = EnemyPosition - EnemyMove_norm * 0.7;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
     }
 
     class Player : Character
     {
-        List<Weapon> WeaponList { get; set; }
         public int Ammo { get; set; }
         public int Score { get; set; }
 
         public void PaintPlayer()
         {
-            ImageBrush player = new ImageBrush();
-            player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
-            character.Fill = player;
-            character.Width = characterWidth;
-            character.Height = characterWidth;
-        }
-
-        
-        public void ExitWhenDead()
-        {
-
+            try
+            {
+                ImageBrush player = new ImageBrush();
+                player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
+                character.Fill = player;
+                character.Width = characterWidth;
+                character.Height = characterWidth;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

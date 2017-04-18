@@ -19,12 +19,19 @@ namespace harjoitustyo
 
         public void PaintRock(Point point)
         {
-            rock = new Ellipse();
-            rock.Width = rnd.Next(25, 100);
-            rock.Height = rnd.Next(25, 100);
-            rockImg = new ImageBrush();
-            rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
-            rock.Fill = rockImg;
+            try
+            {
+                rock = new Ellipse();
+                rock.Width = rnd.Next(25, 100);
+                rock.Height = rnd.Next(25, 100);
+                rockImg = new ImageBrush();
+                rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
+                rock.Fill = rockImg;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
