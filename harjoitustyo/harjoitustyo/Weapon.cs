@@ -13,20 +13,27 @@ namespace harjoitustyo
     class Weapon
     {
         public string Name { get; set; }
-        public const int bulletWidth = 15;
+        public const int bulletWidth = 10;
+        public int bulletcount = 0;
         public int Damage { get; set; }
         public int ClipSize { get; set; }
         public Ellipse bullet = new Ellipse();
 
         public Vector targetVec = new Vector();
         public Vector bulletVec = new Vector();
+        public Vector bulletMove_norm;
 
-        public void Reload()
+        public void Fire(Point target, Vector currentPosition)
         {
+            targetVec = new Vector(target.X, target.Y);
+            bulletVec = new Vector(currentPosition.X, currentPosition.Y); ;
 
+            Vector bulletMove = targetVec - bulletVec;
+            double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
+            bulletMove_norm = bulletMove / bulletMove_length;
         }
 
-        public void PaintBullet()
+        public void BulletVisual()
         {
             try
             {
