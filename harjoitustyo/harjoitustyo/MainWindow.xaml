@@ -11,7 +11,7 @@
         <Canvas Name="paintCanvas"
                 HorizontalAlignment="Stretch" MaxWidth="1600" MaxHeight="900">
             <Canvas.Background>
-                <ImageBrush ImageSource="Resources/snow_ground.jpg"/>
+                <ImageBrush ImageSource="Resources/ground.png"/>
 
             </Canvas.Background>
             
