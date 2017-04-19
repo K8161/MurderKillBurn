@@ -139,7 +139,7 @@ namespace harjoitustyo
             try
             {
                 ImageBrush enemy = new ImageBrush();
-                enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\enemy.png", UriKind.Relative));
+                enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative));
                 character.Fill = enemy;
                 character.Width = characterWidth;
                 character.Height = characterWidth;

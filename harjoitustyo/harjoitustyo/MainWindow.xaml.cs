@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         private int maxDamage = 25; //maximum attack damage from an enemy
         private int enemyCounter = 0;
         private int enemyCount = 2; //amount of enemies
+        private int enemyMem = 0;
         
         //timers
         private DispatcherTimer timer;
@@ -47,6 +48,7 @@ public partial class MainWindow : Window
         private List<Weapon> bullets = new List<Weapon>();
         private List<Point> targets = new List<Point>();
         private int magazineSlot = 0;
+        private int bulletMem = 0;
 
         //rocks
         private List<Point> rocks = new List<Point>(); //collection of rocks
@@ -94,7 +96,6 @@ public partial class MainWindow : Window
 
             //initialize event handlers for using keyboard, mouse movement and mouse button
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
-            this.MouseMove += new MouseEventHandler(Rotate);
             this.MouseMove += new MouseEventHandler(charMove);
             this.MouseDown += new MouseButtonEventHandler(Shoot);
 
@@ -104,6 +105,7 @@ public partial class MainWindow : Window
             playerone.currentPosition = playerone.startingPoint;
             paintCanvas.Children.Add(playerone.character);
             IniEnemies();
+            IniBullets();
 
             //initialize health and ammo for player
             playerone.Hitpoints = 100;
@@ -156,11 +158,25 @@ public partial class MainWindow : Window
             }
         } 
 
+        public void IniBullets()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Weapon bullet = new Weapon();
+                bullets.Add(bullet);
+                bullet.BulletVisual();
+                Point target = new Point(2000, 2000);
+                targets.Add(target);
+            }
+            bulletTimer.Start();
+        }
+
         public void charMove(object sender, MouseEventArgs e)
         {
             //gets the mousepointer coordinates from the window and relays them into a Point variable
             Point targ = e.GetPosition(paintCanvas);
             playerone.Move(targ);
+            playerone.Rotation(targ);
         }
 
         private void Shoot(object sender, MouseButtonEventArgs e)
@@ -172,57 +188,14 @@ public partial class MainWindow : Window
                     switch (e.LeftButton)
                     {
                         case MouseButtonState.Pressed:
-
-                            Point target = e.GetPosition(paintCanvas);
-                            bullet.bulletPosition = playerone.currentPosition;
-                            bullet.Fire(target, bullet.bulletPosition);
-
                             if (playerone.Ammo > 0)
                             {
-                                paintCanvas.Children.Add(bullet.bullet);
-                                bulletTimer.Start();
-                                playerone.Ammo--;
-                                txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
-                            }
-
-                            else
-                            {
-                                txbMag.Text = " Ammo left: Reloading...";
-                                playerone.Ammo = 10;
-                            }
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            }
-        }
-
-        private void Shoot1(object sender, MouseButtonEventArgs e)
-        {
-            if (timer.IsEnabled)
-            {
-                try
-                {
-                    switch (e.LeftButton)
-                    {
-                        case MouseButtonState.Pressed:
-                            if (playerone.Ammo > 0)
-                            {
-                                bullet = new Weapon();
-                                bullets.Add(bullet);
-                                bullet.BulletVisual();
-
-                                Point target = e.GetPosition(paintCanvas);
-                                targets.Add(target);
+                                paintCanvas.Children.Add(bullets[magazineSlot].bullet);
+                                targets[magazineSlot] = e.GetPosition(paintCanvas);
                                 bullets[magazineSlot].bulletPosition = playerone.currentPosition;
-                                bullets[magazineSlot].Fire(targets[magazineSlot], bullet.bulletPosition);
+                                bullets[magazineSlot].Fire(targets[magazineSlot], bullets[magazineSlot].bulletPosition);
 
                             
-                                paintCanvas.Children.Add(bullets[magazineSlot].bullet);
-                                bulletTimer.Start();
                                 playerone.Ammo--;
                                 txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
                                 magazineSlot++;
@@ -241,20 +214,6 @@ public partial class MainWindow : Window
                 {
                     MessageBox.Show(ex.Message);
                 }
-            }
-        }
-
-        private void Rotate(object sender, MouseEventArgs e)
-        {
-            try
-            {
-                //gets the mousepointer coordinates from the window and relays them into a Point variable
-                Point targetPoint = e.GetPosition(this);
-                playerone.Rotation(targetPoint);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
             }
         }
 
@@ -295,12 +254,12 @@ public partial class MainWindow : Window
         {
             try
             {
-                //bullets[magazineSlot].BulletVisual();
-                //Canvas.SetTop(bullets[magazineSlot].bullet, bulletPoint.Y);
-                //Canvas.SetLeft(bullets[magazineSlot].bullet, bulletPoint.X);
-                bullet.BulletVisual();
-                Canvas.SetTop(bullet.bullet, bulletPoint.Y);
-                Canvas.SetLeft(bullet.bullet, bulletPoint.X);
+                foreach (Weapon projectile in bullets)
+                {
+                    projectile.BulletVisual();
+                    Canvas.SetTop(projectile.bullet, bulletPoint.Y);
+                    Canvas.SetLeft(projectile.bullet, bulletPoint.X);
+                }
             }
             catch (Exception ex)
             {
@@ -311,37 +270,55 @@ public partial class MainWindow : Window
         {
             //sets enemies to home on to player's current position
             monsters[enemyCounter].MonsterPositionLogic(playerone.currentPosition);
+            Point targetPoint = new Point(playerone.currentPosition.X, playerone.currentPosition.Y);
+            monsters[enemyCounter].Rotation(targetPoint);
         }
 
         private void MonsterCollisionDetection()
         {
             try
             {
-                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - playerone.currentPosition.X) < 5) &&
-                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 5))
+                enemyMem = 0;
+                foreach (Enemy enemy in monsters)
                 {
-                    if (playerone.Hitpoints - monsters[enemyCounter].Damage > 0)
+                    if ((Math.Abs(enemy.EnemyPosition.X - playerone.currentPosition.X) < 5) &&
+                        (Math.Abs(enemy.EnemyPosition.Y - playerone.currentPosition.Y) < 5))
                     {
-                        //if enemy does damage to player with more than zero hitpoints left, decrease hitpoints accordingly to dealt damage
-                        playerone.Hitpoints -= monsters[enemyCounter].Damage;
-                        Recoil();
-                    }
-                    else
-                    {
-                        GameOver();
-                    }
-                }
-
-                    if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullet.bulletPosition.X) < playerone.characterWidth) &&
-                        (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullet.bulletPosition.Y) < playerone.characterWidth))
-                    {
-                        //if bullet proximity to enemy less than characterWidth, kill enemy
-                        bullet.DiscardBullet();
-                        paintCanvas.Children.Remove(bullet.bullet);
-                        KillMonster();
-                        SpawnMonster();
+                        if (playerone.Hitpoints - enemy.Damage > 0)
+                        {
+                            //if enemy does damage to player with more than zero hitpoints left, decrease hitpoints accordingly to dealt damage
+                            playerone.Hitpoints -= enemy.Damage;
+                            Recoil();
+                        }
+                        else
+                        {
+                            GameOver();
+                        }
+                        enemyMem++;
                     }
                 }
+                    bulletMem = 0;
+                    foreach (Weapon projectile in bullets)
+                    {
+                        enemyMem = 0;
+                        foreach (Enemy enemy in monsters)
+                        {
+                            if ((Math.Abs(enemy.EnemyPosition.X - projectile.bulletPosition.X) < playerone.characterWidth) &&
+                       (Math.Abs(enemy.EnemyPosition.Y - projectile.bulletPosition.Y) < playerone.characterWidth))
+                            {
+                                //if bullet proximity to enemy less than characterWidth, kill enemy
+                                projectile.DiscardBullet();
+                                paintCanvas.Children.Remove(projectile.bullet);
+                                KillMonster();
+                                SpawnMonster();
+                            break;
+                            }
+                            else
+                                enemyMem++;
+                        }
+                        bulletMem++;
+                    }
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -353,22 +330,22 @@ public partial class MainWindow : Window
             try
             {
                 //player is staggered away from the direction of the attack
-                if (playerone.currentPosition.X - monsters[enemyCounter].EnemyPosition.X > 5)
+                if (playerone.currentPosition.X - monsters[enemyMem].EnemyPosition.X > 5)
                 {
                     playerone.currentPosition.X += 10;
                 }
 
-                if (playerone.currentPosition.X - monsters[enemyCounter].EnemyPosition.X < 5)
+                if (playerone.currentPosition.X - monsters[enemyMem].EnemyPosition.X < 5)
                 {
                     playerone.currentPosition.X -= 10;
                 }
 
-                if (playerone.currentPosition.Y - monsters[enemyCounter].EnemyPosition.X > 5)
+                if (playerone.currentPosition.Y - monsters[enemyMem].EnemyPosition.X > 5)
                 {
                     playerone.currentPosition.Y += 10;
                 }
 
-                if (playerone.currentPosition.Y - monsters[enemyCounter].EnemyPosition.X < 5)
+                if (playerone.currentPosition.Y - monsters[enemyMem].EnemyPosition.X < 5)
                 {
                     playerone.currentPosition.Y -= 10;
                 }
@@ -474,9 +451,8 @@ public partial class MainWindow : Window
                 {
                     MonsterFollow();
                     PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
-                    MonsterCollisionDetection();
                 }
-                    //MonsterCollisionDetection();
+                    MonsterCollisionDetection();
             }
             catch (Exception ex)
             {
@@ -489,25 +465,26 @@ public partial class MainWindow : Window
         {
             try
             {
-                if (bullet.bulletPosition.Y > minBorder && bullet.bulletPosition.Y < maxHeight
-                    && bullet.bulletPosition.X > minBorder && bullet.bulletPosition.X < maxWidth)
+                foreach (Weapon projectile in bullets)
                 {
-                    bullet.bulletPosition = bullet.bulletPosition + bullet.bulletMove_norm * difficulty;
-                    PaintBullet(bullet.bulletPosition);
-                }
-                else
-                {
-                    bulletTimer.Stop();
-                    paintCanvas.Children.Remove(bullet.bullet);
-                }
-                foreach (Point point in rocks)
-                {
-                    if ((Math.Abs(point.X - bullet.bulletPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
-                        (Math.Abs(point.Y - bullet.bulletPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
+                    if (projectile.bulletPosition.Y > minBorder && projectile.bulletPosition.Y < maxHeight
+                        && projectile.bulletPosition.X > minBorder && projectile.bulletPosition.X < maxWidth)
                     {
-                        paintCanvas.Children.Remove(bullet.bullet);
-                        bullet.DiscardBullet();
-                        bulletTimer.Stop();
+                        projectile.bulletPosition = projectile.bulletPosition + projectile.bulletMove_norm * difficulty;
+                        PaintBullet(projectile.bulletPosition);
+                    }
+                    else
+                    {
+                        paintCanvas.Children.Remove(projectile.bullet);
+                    }
+                    foreach (Point point in rocks)
+                    {
+                        if ((Math.Abs(point.X - projectile.bulletPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
+                            (Math.Abs(point.Y - projectile.bulletPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
+                        {
+                            paintCanvas.Children.Remove(projectile.bullet);
+                            projectile.DiscardBullet();
+                        }
                     }
                 }
             }
@@ -520,11 +497,10 @@ public partial class MainWindow : Window
         private void KillMonster()
         {
             //add scorevalue to score when an enemy is dispatched from the monsters array
-            playerone.Score += monsters[enemyCounter].ScoreValue; 
+            playerone.Score += monsters[enemyMem].ScoreValue;
 
-            paintCanvas.Children.Remove(bullet.bullet);
+            paintCanvas.Children.Remove(bullets[bulletMem].bullet);
             txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
-            bulletTimer.Stop();           
         }
 
         private void SpawnMonster()
@@ -540,7 +516,7 @@ public partial class MainWindow : Window
                 monster.Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
                 monster.EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
                 paintCanvas.Children.Add(monster.character);
-                monsters[enemyCounter].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
+                monsters[enemyMem].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
             }
             catch (Exception ex)
             {
