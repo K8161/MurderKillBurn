@@ -55,7 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Engine.cs" />
     <Compile Include="HighScoreWindow.xaml.cs" />
     <Compile Include="NameWindow.xaml.cs">
       <DependentUpon>NameWindow.xaml</DependentUpon>
