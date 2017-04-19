@@ -40,6 +40,8 @@ namespace harjoitustyo
 
         public Ellipse character = new Ellipse();
 
+        public ImageBrush characterFill = new ImageBrush();
+
         public Vector startingPoint = new Vector(200, 100);
         public Vector currentPosition = new Vector();
         public Vector charMove_norm;
@@ -100,17 +102,17 @@ namespace harjoitustyo
             }
         }
 
-        public void Rotation(Point targetPoint)
+        public void Rotation(Point targetPoint, Shape shape)
         {
             try
             {
-                Point charSize = new Point(character.ActualWidth / 50, character.ActualHeight / 50);
+                Point charSize = new Point(shape.ActualWidth / 80, shape.ActualHeight / 80);
 
-                character.RenderTransformOrigin = charSize;
-                character.RenderTransform = rotate;
+                shape.RenderTransformOrigin = charSize;
+                shape.RenderTransform = rotate;
 
-                double y = Canvas.GetTop(character) + character.ActualWidth / 2.0;
-                double x = Canvas.GetLeft(character) + character.ActualHeight / 2.0;
+                double y = Canvas.GetTop(shape) + shape.ActualWidth / 2.0;
+                double x = Canvas.GetLeft(shape) + shape.ActualHeight / 2.0;
                 Point originPoint = new Point(x, y);
 
                 rotate.Angle = Angle(originPoint, targetPoint);
@@ -138,9 +140,8 @@ namespace harjoitustyo
         {
             try
             {
-                ImageBrush enemy = new ImageBrush();
-                enemy.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative));
-                character.Fill = enemy;
+                characterFill.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative));
+                character.Fill = characterFill;
                 character.Width = characterWidth;
                 character.Height = characterWidth;
                 ScoreValue = rnd.Next(minScoreValue, maxScoreValue);
@@ -177,15 +178,16 @@ namespace harjoitustyo
         public int Ammo { get; set; }
         public int Score { get; set; }
 
+        public Rectangle tank = new Rectangle();
+
         public void PaintPlayer()
         {
             try
             {
-                ImageBrush player = new ImageBrush();
-                player.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
-                character.Fill = player;
-                character.Width = characterWidth;
-                character.Height = characterWidth;
+                characterFill.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
+                tank.Fill = characterFill;
+                tank.Width = 40;
+                tank.Height = 60;
             }
             catch (Exception ex)
             {

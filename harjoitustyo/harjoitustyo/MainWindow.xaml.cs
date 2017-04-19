@@ -103,7 +103,7 @@ public partial class MainWindow : Window
             IniRocks();
             PaintPlayerOne(playerone.startingPoint);
             playerone.currentPosition = playerone.startingPoint;
-            paintCanvas.Children.Add(playerone.character);
+            paintCanvas.Children.Add(playerone.tank);
             IniEnemies();
             IniBullets();
 
@@ -176,7 +176,7 @@ public partial class MainWindow : Window
             //gets the mousepointer coordinates from the window and relays them into a Point variable
             Point targ = e.GetPosition(paintCanvas);
             playerone.Move(targ);
-            playerone.Rotation(targ);
+            playerone.Rotation(targ, playerone.tank);
         }
 
         private void Shoot(object sender, MouseButtonEventArgs e)
@@ -241,8 +241,8 @@ public partial class MainWindow : Window
             try
             {
                 playerone.PaintPlayer();
-                Canvas.SetTop(playerone.character, currentpoint.Y);
-                Canvas.SetLeft(playerone.character, currentpoint.X);
+                Canvas.SetTop(playerone.tank, currentpoint.Y);
+                Canvas.SetLeft(playerone.tank, currentpoint.X);
             }
             catch (Exception ex)
             {
@@ -271,7 +271,7 @@ public partial class MainWindow : Window
             //sets enemies to home on to player's current position
             monsters[enemyCounter].MonsterPositionLogic(playerone.currentPosition);
             Point targetPoint = new Point(playerone.currentPosition.X, playerone.currentPosition.Y);
-            monsters[enemyCounter].Rotation(targetPoint);
+            monsters[enemyCounter].Rotation(targetPoint, monsters[enemyCounter].character);
         }
 
         private void MonsterCollisionDetection()
