@@ -24,6 +24,7 @@ namespace harjoitustyo
         public Vector targetVec = new Vector();
         public Vector bulletVec = new Vector();
         public Vector bulletMove_norm;
+        public MediaPlayer fireSound = new MediaPlayer();
 
         public void Fire(Point target, Vector currentPosition)
         {
@@ -35,6 +36,9 @@ namespace harjoitustyo
                 Vector bulletMove = targetVec - bulletVec;
                 double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
                 bulletMove_norm = bulletMove / bulletMove_length;
+                fireSound.Open(new Uri(@"..\..\Resources\fire.wav", UriKind.Relative));
+                fireSound.Position = TimeSpan.Zero;
+                fireSound.Play();
             }
             catch (Exception ex)
             {
