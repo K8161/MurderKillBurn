@@ -36,7 +36,6 @@ public partial class MainWindow : Window
         private int minDamage = 5; //minimum attack damage from an enemy
         private int maxDamage = 25; //maximum attack damage from an enemy
         private int enemyCounter = 0;
-        private List<Vector> monsterVectors = new List<Vector>(); //a list for enemy positions
         private int enemyCount = 2; //amount of enemies
         
         //timers
@@ -46,7 +45,9 @@ public partial class MainWindow : Window
 
         //projectiles
         private List<Weapon> bullets = new List<Weapon>();
-        
+        private List<Point> targets = new List<Point>();
+        private int magazineSlot = 0;
+
         //rocks
         private List<Point> rocks = new List<Point>(); //collection of rocks
         private const int obstacleCount = 15;
@@ -95,7 +96,7 @@ public partial class MainWindow : Window
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.MouseMove += new MouseEventHandler(Rotate);
             this.MouseMove += new MouseEventHandler(charMove);
-            this.MouseDown += new MouseButtonEventHandler(Shoot);
+            this.MouseDown += new MouseButtonEventHandler(Shoot1);
 
             //draw rocks, initial enemies and player
             IniRocks();
@@ -199,12 +200,49 @@ public partial class MainWindow : Window
             }
         }
 
-        /*private void Shoot1(object sender, MouseButtonEventArgs e)
+        private void Shoot1(object sender, MouseButtonEventArgs e)
         {
-            bullet = new Weapon();
-            bullets.Add(bullet);
-            bullet.BulletVisual();
-        }*/
+            if (timer.IsEnabled)
+            {
+                try
+                {
+                    switch (e.LeftButton)
+                    {
+                        case MouseButtonState.Pressed:
+                            if (playerone.Ammo > 0)
+                            {
+                                bullet = new Weapon();
+                                bullets.Add(bullet);
+                                bullet.BulletVisual();
+
+                                Point target = e.GetPosition(paintCanvas);
+                                targets.Add(target);
+                                bullets[magazineSlot].bulletPosition = playerone.currentPosition;
+                                bullets[magazineSlot].Fire(targets[magazineSlot], bullet.bulletPosition);
+
+                            
+                                paintCanvas.Children.Add(bullets[magazineSlot].bullet);
+                                bulletTimer.Start();
+                                playerone.Ammo--;
+                                txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
+                                magazineSlot++;
+                            }
+
+                            else
+                            {
+                                txbMag.Text = " Ammo left: Reloading...";
+                                playerone.Ammo = 10;
+                                magazineSlot = 0;
+                            }
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
 
         private void Rotate(object sender, MouseEventArgs e)
         {
@@ -257,9 +295,9 @@ public partial class MainWindow : Window
         {
             try
             {
-                bullet.BulletVisual();
-                Canvas.SetTop(bullet.bullet, bulletPoint.Y);
-                Canvas.SetLeft(bullet.bullet, bulletPoint.X);
+                bullets[magazineSlot].BulletVisual();
+                Canvas.SetTop(bullets[magazineSlot].bullet, bulletPoint.Y);
+                Canvas.SetLeft(bullets[magazineSlot].bullet, bulletPoint.X);
             }
             catch (Exception ex)
             {
@@ -291,14 +329,18 @@ public partial class MainWindow : Window
                     }
                 }
 
-                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullet.bulletPosition.X) < playerone.characterWidth) &&
-                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullet.bulletPosition.Y) < playerone.characterWidth))
+                foreach (Weapon projectile in bullets)
                 {
-                    //if bullet proximity to enemy less than characterWidth, kill enemy
-                    bullet.DiscardBullet();
-                    paintCanvas.Children.Remove(bullet.bullet);
-                    KillMonster();
-                    SpawnMonster();
+
+                    if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullets[magazineSlot].bulletPosition.X) < playerone.characterWidth) &&
+                        (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullets[magazineSlot].bulletPosition.Y) < playerone.characterWidth))
+                    {
+                        //if bullet proximity to enemy less than characterWidth, kill enemy
+                        bullets[magazineSlot].DiscardBullet();
+                        paintCanvas.Children.Remove(bullets[magazineSlot].bullet);
+                        KillMonster();
+                        SpawnMonster();
+                    }
                 }
             }
             catch (Exception ex)
@@ -433,8 +475,8 @@ public partial class MainWindow : Window
                 {
                     MonsterFollow();
                     PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
-                    MonsterCollisionDetection();
                 }
+                    MonsterCollisionDetection();
             }
             catch (Exception ex)
             {
