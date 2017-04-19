@@ -52,7 +52,7 @@ public partial class MainWindow : Window
 
         //rocks
         private List<Point> rocks = new List<Point>(); //collection of rocks
-        private const int obstacleCount = 15;
+        private const int obstacleCount = 25;
 
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
@@ -380,6 +380,15 @@ public partial class MainWindow : Window
                 {
                     playerone.currentPosition.Y -= 5;
                 }
+
+                foreach (Point point in rocks)
+                {
+                    if ((Math.Abs(point.X - playerone.currentPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
+                        (Math.Abs(point.Y - playerone.currentPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
+                    {
+                        playerone.currentPosition += new Vector(rnd.Next(1, 10), rnd.Next(1, 10));
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -400,6 +409,18 @@ public partial class MainWindow : Window
                 MessageBox.Show(ex.Message);
             }
         } 
+
+        private void MonsterRestrictMovement ()
+        {
+            foreach (Point point in rocks)
+            {
+                if ((Math.Abs(point.X - monsters[enemyCounter].EnemyPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
+                    (Math.Abs(point.Y - monsters[enemyCounter].EnemyPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
+                {
+                    monsters[enemyCounter].EnemyPosition += new Vector(rnd.Next(1, 10), rnd.Next(1, 10));
+                }
+            }
+        }
 
         private void OnButtonKeyDown(object sender, KeyEventArgs e)
         {
@@ -451,6 +472,7 @@ public partial class MainWindow : Window
                 {
                     MonsterFollow();
                     PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
+                    MonsterRestrictMovement();
                 }
                     MonsterCollisionDetection();
             }
