@@ -96,7 +96,7 @@ public partial class MainWindow : Window
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.MouseMove += new MouseEventHandler(Rotate);
             this.MouseMove += new MouseEventHandler(charMove);
-            this.MouseDown += new MouseButtonEventHandler(Shoot1);
+            this.MouseDown += new MouseButtonEventHandler(Shoot);
 
             //draw rocks, initial enemies and player
             IniRocks();
@@ -295,9 +295,12 @@ public partial class MainWindow : Window
         {
             try
             {
-                bullets[magazineSlot].BulletVisual();
-                Canvas.SetTop(bullets[magazineSlot].bullet, bulletPoint.Y);
-                Canvas.SetLeft(bullets[magazineSlot].bullet, bulletPoint.X);
+                //bullets[magazineSlot].BulletVisual();
+                //Canvas.SetTop(bullets[magazineSlot].bullet, bulletPoint.Y);
+                //Canvas.SetLeft(bullets[magazineSlot].bullet, bulletPoint.X);
+                bullet.BulletVisual();
+                Canvas.SetTop(bullet.bullet, bulletPoint.Y);
+                Canvas.SetLeft(bullet.bullet, bulletPoint.X);
             }
             catch (Exception ex)
             {
@@ -329,20 +332,16 @@ public partial class MainWindow : Window
                     }
                 }
 
-                foreach (Weapon projectile in bullets)
-                {
-
-                    if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullets[magazineSlot].bulletPosition.X) < playerone.characterWidth) &&
-                        (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullets[magazineSlot].bulletPosition.Y) < playerone.characterWidth))
+                    if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullet.bulletPosition.X) < playerone.characterWidth) &&
+                        (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullet.bulletPosition.Y) < playerone.characterWidth))
                     {
                         //if bullet proximity to enemy less than characterWidth, kill enemy
-                        bullets[magazineSlot].DiscardBullet();
-                        paintCanvas.Children.Remove(bullets[magazineSlot].bullet);
+                        bullet.DiscardBullet();
+                        paintCanvas.Children.Remove(bullet.bullet);
                         KillMonster();
                         SpawnMonster();
                     }
                 }
-            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -475,8 +474,9 @@ public partial class MainWindow : Window
                 {
                     MonsterFollow();
                     PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
-                }
                     MonsterCollisionDetection();
+                }
+                    //MonsterCollisionDetection();
             }
             catch (Exception ex)
             {
