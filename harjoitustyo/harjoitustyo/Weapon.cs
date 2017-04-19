@@ -19,6 +19,8 @@ namespace harjoitustyo
         public int ClipSize { get; set; }
         public Ellipse bullet = new Ellipse();
 
+        public Vector bulletPosition = new Vector();
+
         public Vector targetVec = new Vector();
         public Vector bulletVec = new Vector();
         public Vector bulletMove_norm;
@@ -55,6 +57,12 @@ namespace harjoitustyo
 
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        public void DiscardBullet()
+        {
+            Vector nullVector = new Vector(1900, 1200);
+            bulletPosition = nullVector;
         }
     }
 }

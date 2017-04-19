@@ -37,7 +37,7 @@ public partial class MainWindow : Window
         private int maxDamage = 25; //maximum attack damage from an enemy
         private int enemyCounter = 0;
         private List<Vector> monsterVectors = new List<Vector>(); //a list for enemy positions
-        private const int enemyCount = 20; //amount of enemies
+        private int enemyCount = 2; //amount of enemies
         
         //timers
         private DispatcherTimer timer;
@@ -46,14 +46,13 @@ public partial class MainWindow : Window
 
         //projectiles
         private List<Weapon> bullets = new List<Weapon>();
-        private Vector bulletPosition = new Vector();
         
         //rocks
         private List<Point> rocks = new List<Point>(); //collection of rocks
         private const int obstacleCount = 15;
 
         //objects derived from classes
-        Enemy[] monsters = new Enemy[enemyCount];
+        List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
         Player playerone = new Player();
         Obstacle stone = new Obstacle();
         Weapon bullet = new Weapon();
@@ -135,19 +134,20 @@ public partial class MainWindow : Window
         {
             try
             {
-                for (int i = 0; i < enemyCount - 1; i++) //creates a predetermined amount of enemies
+                for (int i = 0; i < enemyCount; i++) //creates a predetermined amount of enemies
                 {
-                    monsters[i] = new Enemy(); //inserts an instance of class Enemy, into an objectarray derived from Enemy
+                    Enemy monster = new Enemy();
+                    monsters.Add(monster);
                 }
 
-                for (int i = 0; i < enemyCount - 1; i++)
+                for (int i = 0; i < enemyCount; i++)
                 {
                     monsters[i].PaintMonster();
                     monsters[i].Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
-                    monsters[i].EnemyPosition = new Vector(-30, rnd.Next(minBorder, maxHeight));
+                    monsters[i].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
                     paintCanvas.Children.Add(monsters[i].character);
                 }
-                PaintMovingMonsters(new Vector(-30, rnd.Next(minBorder, maxHeight)));
+                PaintMovingMonsters(new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight)));
             }
             catch (Exception ex)
             {
@@ -173,8 +173,8 @@ public partial class MainWindow : Window
                         case MouseButtonState.Pressed:
 
                             Point target = e.GetPosition(paintCanvas);
-                            bulletPosition = playerone.currentPosition;
-                            bullet.Fire(target, bulletPosition);
+                            bullet.bulletPosition = playerone.currentPosition;
+                            bullet.Fire(target, bullet.bulletPosition);
 
                             if (playerone.Ammo > 0)
                             {
@@ -276,8 +276,8 @@ public partial class MainWindow : Window
         {
             try
             {
-                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - playerone.currentPosition.X) < 10) &&
-                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 10))
+                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - playerone.currentPosition.X) < 5) &&
+                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - playerone.currentPosition.Y) < 5))
                 {
                     if (playerone.Hitpoints - monsters[enemyCounter].Damage > 0)
                     {
@@ -291,11 +291,14 @@ public partial class MainWindow : Window
                     }
                 }
 
-                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bulletPosition.X) < playerone.characterWidth) &&
-                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bulletPosition.Y) < playerone.characterWidth))
+                if ((Math.Abs(monsters[enemyCounter].EnemyPosition.X - bullet.bulletPosition.X) < playerone.characterWidth) &&
+                    (Math.Abs(monsters[enemyCounter].EnemyPosition.Y - bullet.bulletPosition.Y) < playerone.characterWidth))
                 {
                     //if bullet proximity to enemy less than characterWidth, kill enemy
+                    bullet.DiscardBullet();
+                    paintCanvas.Children.Remove(bullet.bullet);
                     KillMonster();
+                    SpawnMonster();
                 }
             }
             catch (Exception ex)
@@ -423,12 +426,20 @@ public partial class MainWindow : Window
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            PaintPlayerOne(playerone.currentPosition);
-            for (enemyCounter = 0; enemyCounter < enemyCount - 1; enemyCounter++)
+            try
             {
-                MonsterFollow();
-                PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
-                MonsterCollisionDetection();
+                PaintPlayerOne(playerone.currentPosition);
+                for (enemyCounter = 0; enemyCounter < enemyCount; enemyCounter++)
+                {
+                    MonsterFollow();
+                    PaintMovingMonsters(monsters[enemyCounter].EnemyPosition);
+                    MonsterCollisionDetection();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
             }
         }
 
@@ -436,11 +447,11 @@ public partial class MainWindow : Window
         {
             try
             {
-                if (bulletPosition.Y > minBorder && bulletPosition.Y < maxHeight
-                    && bulletPosition.X > minBorder && bulletPosition.X < maxWidth)
+                if (bullet.bulletPosition.Y > minBorder && bullet.bulletPosition.Y < maxHeight
+                    && bullet.bulletPosition.X > minBorder && bullet.bulletPosition.X < maxWidth)
                 {
-                    bulletPosition = bulletPosition + bullet.bulletMove_norm * difficulty;
-                    PaintBullet(bulletPosition);
+                    bullet.bulletPosition = bullet.bulletPosition + bullet.bulletMove_norm * difficulty;
+                    PaintBullet(bullet.bulletPosition);
                 }
                 else
                 {
@@ -449,10 +460,11 @@ public partial class MainWindow : Window
                 }
                 foreach (Point point in rocks)
                 {
-                    if ((Math.Abs(point.X - bulletPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
-                        (Math.Abs(point.Y - bulletPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
+                    if ((Math.Abs(point.X - bullet.bulletPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
+                        (Math.Abs(point.Y - bullet.bulletPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
                     {
                         paintCanvas.Children.Remove(bullet.bullet);
+                        bullet.DiscardBullet();
                         bulletTimer.Stop();
                     }
                 }
@@ -470,10 +482,29 @@ public partial class MainWindow : Window
 
             paintCanvas.Children.Remove(bullet.bullet);
             txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
-            bulletTimer.Stop();
+            bulletTimer.Stop();           
+        }
 
-            //spawn new enemies and randomize their Y-axis spawnpoints at X-axis point -30
-            monsters[enemyCounter].EnemyPosition = new Vector(-30, rnd.Next(minBorder, maxHeight));
+        private void SpawnMonster()
+        {
+            try
+            {
+                enemyCount++;
+
+                Enemy monster = new Enemy(); //inserts an instance of class Enemy, into an objectarray derived from Enemy
+                monsters.Add(monster);
+
+                monster.PaintMonster();
+                monster.Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
+                monster.EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
+                paintCanvas.Children.Add(monster.character);
+                monsters[enemyCounter].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void GameOver()
