@@ -12,18 +12,18 @@ namespace harjoitustyo
 {
     class Weapon
     {
-        public string Name { get; set; }
         public const int bulletWidth = 10;
         public int bulletcount = 0;
         public int Damage { get; set; }
         public int ClipSize { get; set; }
+
         public Ellipse bullet = new Ellipse();
 
         public Vector bulletPosition = new Vector();
-
         public Vector targetVec = new Vector();
         public Vector bulletVec = new Vector();
         public Vector bulletMove_norm;
+
         public MediaPlayer fireSound = new MediaPlayer();
         public MediaPlayer fireSound2 = new MediaPlayer();
         public bool sound = true;
@@ -38,6 +38,7 @@ namespace harjoitustyo
                 Vector bulletMove = targetVec - bulletVec;
                 double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
                 bulletMove_norm = bulletMove / bulletMove_length;
+
                 if (sound == true)
                 {
                     fireSound.Open(new Uri(@"..\..\Resources\fire.wav", UriKind.Relative));

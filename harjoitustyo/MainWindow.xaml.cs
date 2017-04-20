@@ -42,6 +42,7 @@ public partial class MainWindow : Window
         //timers
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
+        private DispatcherTimer reloadTimer;
         private int difficulty = 5; //used as milliseconds-part in timer
 
         //projectiles
@@ -56,7 +57,7 @@ public partial class MainWindow : Window
 
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
-        Player playerone = new Player();
+        Player playerone = new Player(new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative)));
         Obstacle stone = new Obstacle();
         Weapon bullet = new Weapon();
 
@@ -94,6 +95,10 @@ public partial class MainWindow : Window
             bulletTimer.Interval = new TimeSpan(0, 0, 0, 0, difficulty);
             bulletTimer.Tick += new EventHandler(bulletTimer_Tick);
 
+            reloadTimer = new DispatcherTimer();
+            reloadTimer.Interval = new TimeSpan(0, 0, 0, 1, difficulty);
+            reloadTimer.Tick += new EventHandler(reloadTimer_Tick);
+
             //initialize event handlers for using keyboard, mouse movement and mouse button
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.MouseMove += new MouseEventHandler(charMove);
@@ -118,6 +123,12 @@ public partial class MainWindow : Window
             timer.Start();
         }
 
+        private void reloadTimer_Tick(object sender, EventArgs e)
+        {
+            txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
+            reloadTimer.Stop();
+        }
+
         private void IniRocks()
         {
             for (int n = 0; n < obstacleCount; n++)
@@ -139,7 +150,7 @@ public partial class MainWindow : Window
             {
                 for (int i = 0; i < enemyCount; i++) //creates a predetermined amount of enemies
                 {
-                    Enemy monster = new Enemy();
+                    Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
                     monsters.Add(monster);
                 }
 
@@ -188,23 +199,27 @@ public partial class MainWindow : Window
                     switch (e.LeftButton)
                     {
                         case MouseButtonState.Pressed:
-                            if (playerone.Ammo > 0)
+
+                            if (playerone.Ammo > 0 && !reloadTimer.IsEnabled)
                             {
+                                reloadTimer.Interval = new TimeSpan(0, 0, 0, 1, 0);
                                 paintCanvas.Children.Add(bullets[magazineSlot].bullet);
                                 targets[magazineSlot] = e.GetPosition(paintCanvas);
                                 bullets[magazineSlot].bulletPosition = playerone.currentPosition;
                                 bullets[magazineSlot].Fire(targets[magazineSlot], bullets[magazineSlot].bulletPosition);
-
-                            
+                                
                                 playerone.Ammo--;
-                                txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
                                 magazineSlot++;
+                                reloadTimer.Start();
                             }
 
-                            else
+                            else if (!reloadTimer.IsEnabled)
                             {
-                                txbMag.Text = " Ammo left: Reloading...";
+                                reloadTimer.Interval = new TimeSpan(0, 0, 0, 3, 0);
+                                reloadTimer.Start();
+
                                 playerone.Ammo = 10;
+                                txbMag.Text = "Ammo left: Reloading...";
                                 magazineSlot = 0;
                             }
                             break;
@@ -387,7 +402,7 @@ public partial class MainWindow : Window
                         (Math.Abs(point.Y - playerone.currentPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
                     {
                         playerone.currentPosition += new Vector(rnd.Next(1, 10), rnd.Next(1, 10));
-                    }
+                    }Shape shape = new Ellipse();
                 }
             }
             catch (Exception ex)
@@ -531,7 +546,7 @@ public partial class MainWindow : Window
             {
                 enemyCount++;
 
-                Enemy monster = new Enemy(); //inserts an instance of class Enemy, into an objectarray derived from Enemy
+                Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative))); //inserts an instance of class Enemy, into an objectarray derived from Enemy
                 monsters.Add(monster);
 
                 monster.PaintMonster();

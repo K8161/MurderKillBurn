@@ -19,7 +19,7 @@ namespace harjoitustyo
     public class Character : INotifyPropertyChanged
     {
 
-        public int characterWidth = 30;
+        public int characterWidth = 20;
         public string Name { get; set; }
         private int hitpoints;
         public int Hitpoints
@@ -49,6 +49,11 @@ namespace harjoitustyo
         public RotateTransform rotate = new RotateTransform();
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public Character(ImageSource imgSource)
+        {
+            characterFill.ImageSource = imgSource;
+        }
 
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -134,13 +139,15 @@ namespace harjoitustyo
 
         public Vector EnemyMove_norm;
         public Vector EnemyPosition;
-        
+
+        public Enemy(ImageSource imgSource) : base(imgSource)
+        {
+        }
 
         public void PaintMonster()
         {
             try
             {
-                characterFill.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative));
                 character.Fill = characterFill;
                 character.Width = characterWidth;
                 character.Height = characterWidth;
@@ -180,11 +187,14 @@ namespace harjoitustyo
 
         public Rectangle tank = new Rectangle();
 
+        public Player(ImageSource imgSource) : base(imgSource)
+        {
+        }
+
         public void PaintPlayer()
         {
             try
             {
-                characterFill.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative));
                 tank.Fill = characterFill;
                 tank.Width = 40;
                 tank.Height = 60;
