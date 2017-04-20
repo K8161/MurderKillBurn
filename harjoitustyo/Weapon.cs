@@ -7,11 +7,13 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace harjoitustyo
 {
     class Weapon
     {
+        public DispatcherTimer explosionTimer = new DispatcherTimer();
         public const int bulletWidth = 10;
         public int bulletcount = 0;
         public int Damage { get; set; }
@@ -19,6 +21,7 @@ namespace harjoitustyo
 
         public Ellipse bullet = new Ellipse();
         public ImageBrush cannonball = new ImageBrush();
+        public Ellipse explosion = new Ellipse();
 
         public Vector bulletPosition = new Vector();
         public Vector targetVec = new Vector();
@@ -76,16 +79,29 @@ namespace harjoitustyo
             }
             catch (Exception ex)
             {
-
                 MessageBox.Show(ex.Message);
             }
         }
 
         public void DiscardBullet()
         {
+            explosionTimer.Interval = new TimeSpan(0,0,0,1,0);
+            explosionTimer.Tick += new EventHandler(explosionTimer_Tick);
+            explosionTimer.Start();
 
-            Vector nullVector = new Vector(1900, 1200);
-            bulletPosition = nullVector;
+            if (!explosionTimer.IsEnabled)
+            {
+                Vector nullVector = new Vector(1900, 1200);
+                bulletPosition = nullVector;
+            }
+        }
+
+        private void explosionTimer_Tick(object sender, EventArgs e)
+        {
+            explosion.Fill = cannonball;
+            explosion.Height = 50;
+            explosion.Width = 50;
+            explosionTimer.Stop();
         }
     }
 }
