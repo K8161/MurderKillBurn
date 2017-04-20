@@ -16,7 +16,7 @@ using System.Windows.Threading;
 
 namespace harjoitustyo
 {
-    public class Character : INotifyPropertyChanged
+    public abstract class Character : INotifyPropertyChanged
     {
 
         public int characterWidth = 20;

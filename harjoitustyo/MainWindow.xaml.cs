@@ -58,8 +58,8 @@ public partial class MainWindow : Window
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
         Player playerone = new Player(new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative)));
-        Obstacle stone = new Obstacle();
-        Weapon bullet = new Weapon();
+        Obstacle stone = new Obstacle(new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative)));
+        Weapon bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
 
         //randomizer
         private Random rnd = new Random(); //for randomizing sizes and positions of rocks and enemies
@@ -173,7 +173,7 @@ public partial class MainWindow : Window
         {
             for (int i = 0; i < 10; i++)
             {
-                Weapon bullet = new Weapon();
+                Weapon bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
                 bullets.Add(bullet);
                 bullet.BulletVisual();
                 Point target = new Point(2000, 2000);

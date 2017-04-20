@@ -18,6 +18,7 @@ namespace harjoitustyo
         public int ClipSize { get; set; }
 
         public Ellipse bullet = new Ellipse();
+        public ImageBrush cannonball = new ImageBrush();
 
         public Vector bulletPosition = new Vector();
         public Vector targetVec = new Vector();
@@ -27,6 +28,11 @@ namespace harjoitustyo
         public MediaPlayer fireSound = new MediaPlayer();
         public MediaPlayer fireSound2 = new MediaPlayer();
         public bool sound = true;
+
+        public Weapon(ImageSource imgSource)
+        {
+            cannonball.ImageSource = imgSource;
+        }
 
         public void Fire(Point target, Vector currentPosition)
         {
@@ -64,8 +70,6 @@ namespace harjoitustyo
         {
             try
             {
-                ImageBrush cannonball = new ImageBrush();
-                cannonball.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative));
                 bullet.Fill = cannonball;
                 bullet.Width = bulletWidth;
                 bullet.Height = bulletWidth;
@@ -79,6 +83,7 @@ namespace harjoitustyo
 
         public void DiscardBullet()
         {
+
             Vector nullVector = new Vector(1900, 1200);
             bulletPosition = nullVector;
         }

@@ -14,8 +14,13 @@ namespace harjoitustyo
     class Obstacle
     {
         public Ellipse rock;
-        public ImageBrush rockImg;
+        public ImageBrush rockImg = new ImageBrush();
         private Random rnd = new Random();
+
+        public Obstacle(ImageSource imgSource)
+        {
+            rockImg.ImageSource = imgSource;
+        }
 
         public void PaintRock(Point point)
         {
@@ -24,8 +29,6 @@ namespace harjoitustyo
                 rock = new Ellipse();
                 rock.Width = rnd.Next(25, 100);
                 rock.Height = rnd.Next(25, 100);
-                rockImg = new ImageBrush();
-                rockImg.ImageSource = new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative));
                 rock.Fill = rockImg;
             }
             catch (Exception ex)
