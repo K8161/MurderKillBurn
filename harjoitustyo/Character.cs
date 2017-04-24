@@ -57,9 +57,16 @@ namespace harjoitustyo
 
         protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
+            try
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
