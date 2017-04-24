@@ -43,6 +43,7 @@ public partial class MainWindow : Window
         private DispatcherTimer timer;
         private DispatcherTimer bulletTimer;
         private DispatcherTimer reloadTimer;
+        private DispatcherTimer explosionTimer;
         private int difficulty = 5; //used as milliseconds-part in timer
 
         //projectiles
@@ -57,10 +58,11 @@ public partial class MainWindow : Window
 
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
-        Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
+        Enemy monster;
         Player playerone = new Player(new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative)));
         Obstacle stone = new Obstacle(new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative)));
-        Weapon bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
+        Weapon bullet;
+        Weapon explosion = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\explosion.png", UriKind.Relative)));
 
         //randomizer
         private Random rnd = new Random(); //for randomizing sizes and positions of rocks and enemies
@@ -100,6 +102,10 @@ public partial class MainWindow : Window
             reloadTimer.Interval = new TimeSpan(0, 0, 0, 1, difficulty);
             reloadTimer.Tick += new EventHandler(reloadTimer_Tick);
 
+            explosionTimer = new DispatcherTimer();
+            explosionTimer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            explosionTimer.Tick += new EventHandler(explosionTimer_Tick);
+
             //initialize event handlers for using keyboard, mouse movement and mouse button
             this.KeyDown += new KeyEventHandler(OnButtonKeyDown);
             this.MouseMove += new MouseEventHandler(charMove);
@@ -122,6 +128,25 @@ public partial class MainWindow : Window
 
             //start game
             timer.Start();
+        }
+
+        private void explosionTimer_Tick(object sender, EventArgs e)
+        {
+            if (explosion.explosion.Width < 10)
+            {
+                explosion.explosion.Width = 10;
+                explosion.explosion.Height = 10;
+            }
+            else if (explosion.explosion.Width < 50)
+            {
+                explosion.explosion.Width += 2;
+                explosion.explosion.Height += 2;
+            }
+            else
+            {
+                explosionTimer.Stop();
+                paintCanvas.Children.Remove(explosion.explosion);
+            }
         }
 
         private void reloadTimer_Tick(object sender, EventArgs e)
@@ -252,10 +277,29 @@ public partial class MainWindow : Window
             }
         }
 
+        private void PaintExplosion(Point detonationPoint)
+        {
+            try
+            {
+                detonationPoint = explosion.detonationPoint;
+                explosionTimer.Start();
+                explosion = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\explosion.png", UriKind.Relative)));
+                explosion.ExplosionVisual();
+                Canvas.SetTop(explosion.explosion, detonationPoint.Y);
+                Canvas.SetLeft(explosion.explosion, detonationPoint.X);
+                paintCanvas.Children.Add(explosion.explosion);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         private void PaintPlayerOne(Vector currentpoint)
         {
             try
             {
+                //paints the player onto the canvas at the vector currentpoint
                 playerone.PaintPlayer();
                 Canvas.SetTop(playerone.tank, currentpoint.Y);
                 Canvas.SetLeft(playerone.tank, currentpoint.X);
@@ -317,18 +361,21 @@ public partial class MainWindow : Window
                     foreach (Weapon projectile in bullets)
                     {
                         enemyMem = 0;
-                        foreach (Enemy enemy in monsters)
+                    foreach (Enemy enemy in monsters)
+                    {
+                        if ((Math.Abs(enemy.EnemyPosition.X - projectile.bulletPosition.X) < enemy.characterWidth) &&
+                            (Math.Abs(enemy.EnemyPosition.Y - projectile.bulletPosition.Y) < enemy.characterWidth))
                         {
-                            if ((Math.Abs(enemy.EnemyPosition.X - projectile.bulletPosition.X) < playerone.characterWidth) &&
-                                (Math.Abs(enemy.EnemyPosition.Y - projectile.bulletPosition.Y) < playerone.characterWidth))
-                            {
-                                //if bullet proximity to enemy less than characterWidth, kill enemy
-                                projectile.DiscardBullet();
-                                paintCanvas.Children.Remove(projectile.bullet);
-                                KillMonster();
-                                SpawnMonster();
+                            explosion.detonationPoint = new Point(projectile.bulletPosition.X, projectile.bulletPosition.Y);
+
+                            PaintExplosion(explosion.detonationPoint);
+                            projectile.DiscardBullet();
+                            paintCanvas.Children.Remove(projectile.bullet);
+                        
+                            //if bullet proximity to enemy less than characterWidth, kill enemy
+                            KillMonster();
                             break;
-                            }
+                        }
                             else
                                 enemyMem++;
                         }
@@ -403,7 +450,7 @@ public partial class MainWindow : Window
                         (Math.Abs(point.Y - playerone.currentPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
                     {
                         playerone.currentPosition += new Vector(rnd.Next(1, 10), rnd.Next(1, 10));
-                    }Shape shape = new Ellipse();
+                    }
                 }
             }
             catch (Exception ex)
@@ -514,14 +561,18 @@ public partial class MainWindow : Window
                     else
                     {
                         paintCanvas.Children.Remove(projectile.bullet);
+                        projectile.DiscardBullet();
                     }
                     foreach (Point point in rocks)
                     {
                         if ((Math.Abs(point.X - projectile.bulletPosition.X) < stone.rock.ActualWidth - stone.rock.ActualWidth / 2) &&
                             (Math.Abs(point.Y - projectile.bulletPosition.Y) < stone.rock.ActualHeight - stone.rock.ActualHeight / 2))
                         {
-                            paintCanvas.Children.Remove(projectile.bullet);
+                            explosion.detonationPoint = new Point(projectile.bulletPosition.X, projectile.bulletPosition.Y);
+
+                            PaintExplosion(explosion.detonationPoint);
                             projectile.DiscardBullet();
+                            paintCanvas.Children.Remove(projectile.bullet);
                         }
                     }
                 }
@@ -539,6 +590,7 @@ public partial class MainWindow : Window
 
             paintCanvas.Children.Remove(bullets[bulletMem].bullet);
             txbScore.Text = "Score: " + Convert.ToString(playerone.Score);
+            SpawnMonster();
         }
 
         private void SpawnMonster()
@@ -547,7 +599,7 @@ public partial class MainWindow : Window
             {
                 enemyCount++;
 
-                Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative))); //inserts an instance of class Enemy, into an objectarray derived from Enemy
+                monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
                 monsters.Add(monster);
 
                 monster.PaintMonster();
@@ -569,6 +621,7 @@ public partial class MainWindow : Window
             {
                 timer.Stop();
                 bulletTimer.Stop();
+                explosionTimer.Stop();
                 btnOK.Visibility = Visibility.Visible;
                 txtName.Visibility = Visibility.Visible;
             }

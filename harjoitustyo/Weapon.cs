@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -13,7 +14,6 @@ namespace harjoitustyo
 {
     class Weapon
     {
-        public DispatcherTimer explosionTimer = new DispatcherTimer();
         public const int bulletWidth = 10;
         public int bulletcount = 0;
         public int Damage { get; set; }
@@ -24,9 +24,11 @@ namespace harjoitustyo
         public Ellipse explosion = new Ellipse();
 
         public Vector bulletPosition = new Vector();
-        public Vector targetVec = new Vector();
-        public Vector bulletVec = new Vector();
+        public Vector targetVec;
+        public Vector bulletVec;
         public Vector bulletMove_norm;
+
+        public Point detonationPoint;
 
         public MediaPlayer fireSound = new MediaPlayer();
         public MediaPlayer fireSound2 = new MediaPlayer();
@@ -85,23 +87,29 @@ namespace harjoitustyo
 
         public void DiscardBullet()
         {
-            explosionTimer.Interval = new TimeSpan(0,0,0,1,0);
-            explosionTimer.Tick += new EventHandler(explosionTimer_Tick);
-            explosionTimer.Start();
-
-            if (!explosionTimer.IsEnabled)
+            try
             {
                 Vector nullVector = new Vector(1900, 1200);
                 bulletPosition = nullVector;
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
-        private void explosionTimer_Tick(object sender, EventArgs e)
+        public void ExplosionVisual()
         {
-            explosion.Fill = cannonball;
-            explosion.Height = 50;
-            explosion.Width = 50;
-            explosionTimer.Stop();
+            try
+            {
+                explosion.Fill = cannonball;
+                explosion.Width = bulletWidth;
+                explosion.Height = bulletWidth;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }

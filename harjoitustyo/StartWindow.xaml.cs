@@ -40,11 +40,7 @@ namespace harjoitustyo
         {
             MainWindow mainwindow = new MainWindow();
             mainwindow.Show();
-            foreach (Window item in App.Current.Windows)
-            {
-                if (item != mainwindow)
-                    item.Close();
-            }
+            this.Close();
         }
     }
 }
