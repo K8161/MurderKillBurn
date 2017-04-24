@@ -57,6 +57,7 @@ public partial class MainWindow : Window
 
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
+        Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
         Player playerone = new Player(new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative)));
         Obstacle stone = new Obstacle(new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative)));
         Weapon bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
@@ -150,7 +151,7 @@ public partial class MainWindow : Window
             {
                 for (int i = 0; i < enemyCount; i++) //creates a predetermined amount of enemies
                 {
-                    Enemy monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
+                    monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
                     monsters.Add(monster);
                 }
 
@@ -173,7 +174,7 @@ public partial class MainWindow : Window
         {
             for (int i = 0; i < 10; i++)
             {
-                Weapon bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
+                bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
                 bullets.Add(bullet);
                 bullet.BulletVisual();
                 Point target = new Point(2000, 2000);
@@ -319,7 +320,7 @@ public partial class MainWindow : Window
                         foreach (Enemy enemy in monsters)
                         {
                             if ((Math.Abs(enemy.EnemyPosition.X - projectile.bulletPosition.X) < playerone.characterWidth) &&
-                       (Math.Abs(enemy.EnemyPosition.Y - projectile.bulletPosition.Y) < playerone.characterWidth))
+                                (Math.Abs(enemy.EnemyPosition.Y - projectile.bulletPosition.Y) < playerone.characterWidth))
                             {
                                 //if bullet proximity to enemy less than characterWidth, kill enemy
                                 projectile.DiscardBullet();
