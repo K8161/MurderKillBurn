@@ -15,7 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>Z:\k9090\1_kevat_2017\Olio-ohjelmointi\release_test\</PublishUrl>
+    <PublishUrl>J:\JAMK\Olio_ohjelmointi\release_test\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -24,8 +24,8 @@
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -153,28 +153,28 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\snow_ground.jpg" />
+    <Content Include="Resources\snow_ground.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\player.png" />
+    <Content Include="Resources\player.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Cannonball.png" />
+    <Content Include="Resources\Cannonball.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\stone.png" />
+    <Content Include="Resources\stone.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\enemy.png" />
+    <Content Include="Resources\enemy.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\ground.png" />
+    <Content Include="Resources\ground.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\pommimies.png" />
+    <Content Include="Resources\pommimies.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\explosion.png" />
+    <Content Include="Resources\explosion.png" />
     <Content Include="Resources\fire.wav" />
   </ItemGroup>
   <ItemGroup>

@@ -37,6 +37,7 @@ namespace harjoitustyo
         public MediaPlayer fireSound = new MediaPlayer();
         public MediaPlayer fireSound2 = new MediaPlayer();
         public bool sound = true;
+        public Uri soundSrc = new Uri(@"Resources\fire.wav", UriKind.Relative);
 
         public Weapon(ImageSource imgSource)
         {
@@ -57,14 +58,14 @@ namespace harjoitustyo
                 //boolean is used as a switch which sound plays
                 if (sound == true)
                 {
-                    fireSound.Open(new Uri(@"..\..\Resources\fire.wav", UriKind.Relative));
+                    fireSound.Open(soundSrc);
                     fireSound.Position = TimeSpan.Zero;
                     fireSound.Play();
                     sound = false;
                 }
                 else if (sound == false)
                 {
-                    fireSound2.Open(new Uri(@"..\..\Resources\fire.wav", UriKind.Relative));
+                    fireSound2.Open(soundSrc);
                     fireSound2.Position = TimeSpan.Zero;
                     fireSound2.Play();
                     sound = true;

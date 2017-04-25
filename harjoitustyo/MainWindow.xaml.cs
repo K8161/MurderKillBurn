@@ -59,10 +59,10 @@ public partial class MainWindow : Window
         //objects derived from classes
         List<Enemy> monsters = new List<Enemy>(); //list for enemymonsters
         Enemy monster;
-        Player playerone = new Player(new BitmapImage(new Uri(@"..\..\Resources\player.png", UriKind.Relative)));
-        Obstacle stone = new Obstacle(new BitmapImage(new Uri(@"..\..\Resources\stone.png", UriKind.Relative)));
+        Player playerone = new Player(new BitmapImage(new Uri(@"Resources\player.png", UriKind.Relative)));
+        Obstacle stone = new Obstacle(new BitmapImage(new Uri(@"Resources\stone.png", UriKind.Relative)));
         Weapon bullet;
-        Weapon explosion = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\explosion.png", UriKind.Relative)));
+        Weapon explosion = new Weapon(new BitmapImage(new Uri(@"Resources\explosion.png", UriKind.Relative)));
 
         //randomizer
         private Random rnd = new Random(); //for randomizing sizes and positions of rocks and enemies
@@ -187,7 +187,7 @@ public partial class MainWindow : Window
             {
                 for (int i = 0; i < enemyCount; i++)
                 {
-                    monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative))); //tellls program to use this picture as enemies
+                    monster = new Enemy(new BitmapImage(new Uri(@"Resources\pommimies.png", UriKind.Relative))); //tellls program to use this picture as enemies
                     monsters.Add(monster); //add monsters to list
                 }
 
@@ -213,7 +213,7 @@ public partial class MainWindow : Window
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    bullet = new Weapon(new BitmapImage(new Uri(@"..\..\Resources\cannonball.png", UriKind.Relative)));
+                    bullet = new Weapon(new BitmapImage(new Uri(@"Resources\cannonball.png", UriKind.Relative)));
                     bullets.Add(bullet);
                     bullet.BulletVisual();
                     Point target = new Point(2000, 2000);
@@ -651,7 +651,7 @@ public partial class MainWindow : Window
             {
                 enemyCount++;
 
-                monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
+                monster = new Enemy(new BitmapImage(new Uri(@"Resources\pommimies.png", UriKind.Relative)));
                 monsters.Add(monster);
 
                 monster.PaintMonster();
