@@ -16,9 +16,9 @@ using System.Windows.Threading;
 
 namespace harjoitustyo
 {
-    public abstract class Character : INotifyPropertyChanged
+    public abstract class Character : INotifyPropertyChanged //used for healthbar binding
     {
-
+        //properties
         public int characterWidth = 20;
         public string Name { get; set; }
         private int hitpoints;
@@ -38,14 +38,18 @@ namespace harjoitustyo
 
         public Random rnd = new Random();
 
+        //used for showing objects in graphical interface
         public Ellipse character = new Ellipse();
 
-        public ImageBrush characterFill = new ImageBrush();
+        //used for filling shapes
+        public ImageBrush characterFill = new ImageBrush(); 
 
+        //vectors handling movement
         public Vector startingPoint = new Vector(200, 100);
         public Vector currentPosition = new Vector();
         public Vector charMove_norm;
 
+        //used to rotate shapes
         public RotateTransform rotate = new RotateTransform();
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -70,6 +74,7 @@ namespace harjoitustyo
             }
         }
 
+        //method for movement, basically uses vectors to calculate ghow character should move on screen
         public void Move(Point targ)
         {
             try
@@ -87,6 +92,7 @@ namespace harjoitustyo
             }
         }
 
+        //method for defining angle to rotation method
         public double Angle(Point origin, Point target)
         {
             try
@@ -114,6 +120,7 @@ namespace harjoitustyo
             }
         }
 
+        //used for rotating object on canvas
         public void Rotation(Point targetPoint, Shape shape)
         {
             try
@@ -151,6 +158,7 @@ namespace harjoitustyo
         {
         }
 
+        //method to "paint" monster on canvas
         public void PaintMonster()
         {
             try
@@ -166,6 +174,7 @@ namespace harjoitustyo
             }
         }
 
+        //used to track player position, and make enemies head towards player
         public void MonsterPositionLogic(Vector currentPosition)
         {
             try
@@ -198,6 +207,7 @@ namespace harjoitustyo
         {
         }
 
+        //used to "paint" player to canvas
         public void PaintPlayer()
         {
             try

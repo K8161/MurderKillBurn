@@ -38,7 +38,6 @@ namespace harjoitustyo
             {
                 StartWindow startwindow = new StartWindow();
                 startwindow.Show();
-                // CloseAllWindows();
                 foreach (Window item in App.Current.Windows)
                 {
                     if (item != startwindow)

@@ -13,6 +13,7 @@ namespace harjoitustyo
 {
     class Obstacle
     {
+        //ellipse is used to represent rock, then fill it with picture of rock
         public Ellipse rock;
         public ImageBrush rockImg = new ImageBrush();
         private Random rnd = new Random();

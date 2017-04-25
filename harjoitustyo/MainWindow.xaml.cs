@@ -130,6 +130,7 @@ public partial class MainWindow : Window
             timer.Start();
         }
 
+        //explosion timer is used to grow size of explosion and to remove explosion from canvas
         private void explosionTimer_Tick(object sender, EventArgs e)
         {
             try
@@ -156,12 +157,14 @@ public partial class MainWindow : Window
             }
         }
 
+        //used to make reloading take its time
         private void reloadTimer_Tick(object sender, EventArgs e)
         {
             txbMag.Text = "Ammo left: " + Convert.ToString(playerone.Ammo);
             reloadTimer.Stop();
         }
 
+        //creates rock to map based on value determined earlier
         private void IniRocks()
         {
             for (int n = 0; n < obstacleCount; n++)
@@ -177,21 +180,22 @@ public partial class MainWindow : Window
             }
         }
 
+        //creates a predetermined amount of enemies
         public void IniEnemies()
         {
             try
             {
-                for (int i = 0; i < enemyCount; i++) //creates a predetermined amount of enemies
+                for (int i = 0; i < enemyCount; i++)
                 {
-                    monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative)));
-                    monsters.Add(monster);
+                    monster = new Enemy(new BitmapImage(new Uri(@"..\..\Resources\pommimies.png", UriKind.Relative))); //tellls program to use this picture as enemies
+                    monsters.Add(monster); //add monsters to list
                 }
 
                 for (int i = 0; i < enemyCount; i++)
                 {
                     monsters[i].PaintMonster();
                     monsters[i].Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
-                    monsters[i].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight));
+                    monsters[i].EnemyPosition = new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight)); //randomizes enemy astarting location
                     paintCanvas.Children.Add(monsters[i].character);
                 }
                 PaintMovingMonsters(new Vector(rnd.Next(minBorder, maxWidth), rnd.Next(minBorder, maxHeight)));
@@ -202,6 +206,7 @@ public partial class MainWindow : Window
             }
         } 
 
+        //initialize bullets for later use
         public void IniBullets()
         {
             try
@@ -237,6 +242,7 @@ public partial class MainWindow : Window
             }
         }
 
+        //used for shooting, basically takes mouse pointer location and sends projectile to that direction
         private void Shoot(object sender, MouseButtonEventArgs e)
         {
             if (timer.IsEnabled)
@@ -247,7 +253,7 @@ public partial class MainWindow : Window
                     {
                         case MouseButtonState.Pressed:
 
-                            if (playerone.Ammo > 0 && !reloadTimer.IsEnabled)
+                            if (playerone.Ammo > 0 && !reloadTimer.IsEnabled) //can't shoot if reloading, also have to have ammo left to shoot
                             {
                                 reloadTimer.Interval = new TimeSpan(0, 0, 0, 1, 0);
                                 paintCanvas.Children.Add(bullets[magazineSlot].bullet);
@@ -255,12 +261,12 @@ public partial class MainWindow : Window
                                 bullets[magazineSlot].bulletPosition = playerone.currentPosition;
                                 bullets[magazineSlot].Fire(targets[magazineSlot], bullets[magazineSlot].bulletPosition);
                                 
-                                playerone.Ammo--;
-                                magazineSlot++;
+                                playerone.Ammo--; //decreases amount of ammo
+                                magazineSlot++; 
                                 reloadTimer.Start();
                             }
 
-                            else if (!reloadTimer.IsEnabled)
+                            else if (!reloadTimer.IsEnabled) //if out of ammo, starts reloading magazine
                             {
                                 reloadTimer.Interval = new TimeSpan(0, 0, 0, 3, 0);
                                 reloadTimer.Start();
@@ -298,6 +304,7 @@ public partial class MainWindow : Window
             }
         }
 
+        //used when projectile hits something and explodes
         private void PaintExplosion(Point detonationPoint)
         {
             try
@@ -330,6 +337,7 @@ public partial class MainWindow : Window
             }
         }
 
+        //used to paint projectile to canvas
         private void PaintBullet(Vector bulletPoint)
         {
             try
@@ -365,10 +373,11 @@ public partial class MainWindow : Window
         {
             try
             {
-                enemyMem = 0;
+                enemyMem = 0; //this variable is used to "remember" which monster hits player or gets shot
+                //loop to go through list of enemies and compare their position to player position
                 foreach (Enemy enemy in monsters)
                 {
-                    if ((Math.Abs(enemy.EnemyPosition.X - playerone.currentPosition.X) < 5) &&
+                    if ((Math.Abs(enemy.EnemyPosition.X - playerone.currentPosition.X) < 5) && 
                         (Math.Abs(enemy.EnemyPosition.Y - playerone.currentPosition.Y) < 5))
                     {
                         if (playerone.Hitpoints - enemy.Damage > 0)
@@ -384,8 +393,9 @@ public partial class MainWindow : Window
                         enemyMem++;
                     }
                 }
-                    bulletMem = 0;
-                    foreach (Weapon projectile in bullets)
+                    bulletMem = 0; //this variable is used to "remember" which bullet hits something
+                //two loops which compare bullet locations to enemy locations
+                foreach (Weapon projectile in bullets)
                     {
                         enemyMem = 0;
                     foreach (Enemy enemy in monsters)
@@ -500,6 +510,7 @@ public partial class MainWindow : Window
             }
         } 
 
+        //used to check if monster hits rock and push it around the rock
         private void MonsterRestrictMovement ()
         {
             try
@@ -646,6 +657,7 @@ public partial class MainWindow : Window
                 monster.PaintMonster();
                 monster.Damage = rnd.Next(minDamage, maxDamage); //randomizes enemy attack damage to between min and max values
 
+                //used to make enemies spawn randomly somewhere outside the screen
                 switch (rnd.Next(1,5))
                 {
                     case 1:
@@ -724,7 +736,7 @@ public partial class MainWindow : Window
 
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            if (txtName.Text == "Insert Player Name" || txtName.Text == "")
+            if (txtName.Text == "Insert Player Name" || txtName.Text == "") //player has to give some name other than empty
             { MessageBox.Show("Not valid name!"); }
             else
             {
@@ -741,6 +753,7 @@ public partial class MainWindow : Window
             }
         }
 
+        //used to save player scores to external file
         private void SaveScore()
         {
             string name = playerone.Name;

@@ -14,15 +14,18 @@ namespace harjoitustyo
 {
     class Weapon
     {
+        //properties
         public const int bulletWidth = 10;
         public int bulletcount = 0;
         public int Damage { get; set; }
         public int ClipSize { get; set; }
 
+        //ellipse to represent projectile and fill it with picture
         public Ellipse bullet = new Ellipse();
         public ImageBrush cannonball = new ImageBrush();
         public Ellipse explosion = new Ellipse();
 
+        //vectors for projectile movement
         public Vector bulletPosition = new Vector();
         public Vector targetVec;
         public Vector bulletVec;
@@ -30,6 +33,7 @@ namespace harjoitustyo
 
         public Point detonationPoint;
 
+        //sounds for firing, two sounds to make them play at the same time
         public MediaPlayer fireSound = new MediaPlayer();
         public MediaPlayer fireSound2 = new MediaPlayer();
         public bool sound = true;
@@ -50,6 +54,7 @@ namespace harjoitustyo
                 double bulletMove_length = Math.Sqrt(Math.Pow(bulletMove.X, 2) + Math.Pow(bulletMove.Y, 2)) / 4;
                 bulletMove_norm = bulletMove / bulletMove_length;
 
+                //boolean is used as a switch which sound plays
                 if (sound == true)
                 {
                     fireSound.Open(new Uri(@"..\..\Resources\fire.wav", UriKind.Relative));
@@ -71,6 +76,7 @@ namespace harjoitustyo
             }
         }
 
+        //used to paint bullet to canvas
         public void BulletVisual()
         {
             try
@@ -85,6 +91,7 @@ namespace harjoitustyo
             }
         }
 
+        //used when bullet hits something, basically throws bullet off the screen instead of deleting it
         public void DiscardBullet()
         {
             try

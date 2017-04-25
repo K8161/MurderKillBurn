@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 namespace harjoitustyo
 {
     /// <summary>
-    /// Interaction logic for StartWindow.xaml
+    /// Just few methods which direct player to other places
     /// </summary>
     public partial class StartWindow : Window
     {

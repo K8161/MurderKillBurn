@@ -25,6 +25,7 @@ namespace harjoitustyo
             ReadScore();
         }
 
+        //method to read previously saved scores
         public void ReadScore()
         {
             try
@@ -39,6 +40,7 @@ namespace harjoitustyo
             }
         }
 
+        //method to return main menu
         private void btnHighScore_Click(object sender, RoutedEventArgs e)
         {
             StartWindow window1 = new StartWindow();
